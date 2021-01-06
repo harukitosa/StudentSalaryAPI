@@ -1,0 +1,8 @@
+runtime: go114 # replace with go111 for Go 1.11
+
+env_variables:
+    DB_USER: "user"
+    DB_PASS: "pass"
+    INSTANCE_CONNECTION_NAME: "project:region:instance"
+    DB_NAME: "dbname"
+    RUNENV: "production"
