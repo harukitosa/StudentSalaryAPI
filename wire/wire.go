@@ -23,3 +23,11 @@ func InitJobSalaryAPI(db *gorm.DB) handler.JobSalaryHandler {
 	jobSalaryHandler := handler.NewJobSalaryHandler(jobSalaryApplication)
 	return jobSalaryHandler
 }
+
+// InitJobSalaryMapAPI is
+func InitJobSalaryMapAPI(db *gorm.DB) handler.JobSalaryMapHandler {
+	jobSalaryMapRepository := mysql.NewJobSalaryMapRepositoryImpl(db)
+	jobSalaryMapApplication := application.NewJobSalaryMapApplication(jobSalaryMapRepository)
+	jobSalaryMapHandler := handler.NewJobSalaryMapHandler(jobSalaryMapApplication)
+	return jobSalaryMapHandler
+}

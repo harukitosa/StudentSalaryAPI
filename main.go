@@ -69,6 +69,7 @@ func main() {
 	}
 	userAPI := wire.InitUserAPI(db)
 	jobSalaryAPI := wire.InitJobSalaryAPI(db)
+	jobSalaryMapAPI := wire.InitJobSalaryMapAPI(db)
 
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.JobSalary{})
@@ -83,6 +84,9 @@ func main() {
 	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary())
 	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary())
 	e.POST("/export/jobSalary", jobSalaryAPI.ExportJobsSalary())
+
+	// JobSalaryMap
+	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap())
 
 	port := os.Getenv("PORT")
 	if port == "" {
