@@ -22,7 +22,7 @@ func NewJobSalaryMapRepositoryImpl(DB *gorm.DB) repository.JobSalaryMapRepositor
 // Select is
 func (r *JobSalaryMapRepositoryImpl) Select() ([]model.JobSalaryMap, error) {
 	var list []model.JobSalaryMap
-	tx := r.db.Table("job_salaries").Select("name, max(salary) as max, min(salary) as min").Group("name").Find(&list)
+	tx := r.db.Table("job_salaries").Select("name, max(salary) as max, min(salary) as min, count(*) as count").Group("name").Find(&list)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
