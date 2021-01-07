@@ -21,7 +21,7 @@ func NewUserHandler(userApplication application.UserApplication) UserHandler {
 // CreateUser is
 func (h *UserHandler) CreateUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, err := h.userApplication.Insert(model.User{Name: "test", ID: 1})
+		id, err := h.userApplication.Insert(model.User{Name: "test"})
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}

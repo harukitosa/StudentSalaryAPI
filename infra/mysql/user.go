@@ -1,20 +1,19 @@
 package mysql
 
 import (
-	"errors"
 	"studentSalaryAPI/model"
 	"studentSalaryAPI/repository"
 
-	"github.com/jmoiron/sqlx"
+	"gorm.io/gorm"
 )
 
 // UserRepositoryImpl is dependent sqlx and UserRepository
 type UserRepositoryImpl struct {
-	db *sqlx.DB
+	db *gorm.DB
 }
 
 // NewUserRepositoryImpl is
-func NewUserRepositoryImpl(DB *sqlx.DB) repository.UserRepository {
+func NewUserRepositoryImpl(DB *gorm.DB) repository.UserRepository {
 	return &UserRepositoryImpl{
 		db: DB,
 	}
@@ -22,23 +21,23 @@ func NewUserRepositoryImpl(DB *sqlx.DB) repository.UserRepository {
 
 // Insert is
 func (r *UserRepositoryImpl) Insert(user model.User) (int, error) {
-	result, err := r.db.NamedExec("INSERT INTO user (name) VALUES (:name)", user)
-	if err != nil {
-		return 0, err
+	result := r.db.Create(&user)
+	if result.Error != nil {
+		return 0, result.Error
 	}
-	var id int64
-	id, err = result.LastInsertId()
-	return int(id), err
+	return int(user.ID), nil
 }
 
 // SelectByID is
 func (r *UserRepositoryImpl) SelectByID(id int) (model.User, error) {
-	return model.User{ID: 0, Name: "hoge"}, errors.New("Not Impl")
+	var user model.User
+	tx := r.db.First(&user, id)
+	return user, tx.Error
 }
 
 // SelectAll is
 func (r *UserRepositoryImpl) SelectAll() ([]model.User, error) {
 	var users []model.User
-	err := r.db.Select(&users, "SELECT * FROM user ORDER BY id ASC")
-	return users, err
+	result := r.db.Find(&users)
+	return users, result.Error
 }
