@@ -39,10 +39,9 @@ func initDB() *gorm.DB {
 	}
 
 	dns := fmt.Sprintf("%s:%s@unix(/%s/%s)/%s?parseTime=true", dbUser, dbPwd, socketDir, instanceConnectionName, dbName)
-	// db, err := sqlx.Connect("mysql", dns)
-	// 詳細は https://github.com/go-sql-driver/mysql#dsn-data-source-name を参照
-	// dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB")
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +49,9 @@ func initDB() *gorm.DB {
 }
 
 func initLocalDB() *gorm.DB {
+
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,14 +68,18 @@ func main() {
 		db = initLocalDB()
 	}
 	userAPI := wire.InitUserAPI(db)
+	jobSalaryAPI := wire.InitJobSalaryAPI(db)
 
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.JobSalary{})
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
 	})
 	e.GET("/data", userAPI.CreateUser())
 	e.GET("/get", userAPI.GetAllUser())
+	e.GET("/jobSalary/get", jobSalaryAPI.GetAllJobSalary())
+	e.GET("/jobSalary/insert", jobSalaryAPI.CreateJobSalary())
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -82,6 +87,5 @@ func main() {
 		log.Printf("Defaulting to port %s", port)
 	}
 	log.Printf("Listening on port %s", port)
-
 	e.Logger.Fatal(e.Start(":" + port))
 }

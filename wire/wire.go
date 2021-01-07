@@ -15,3 +15,11 @@ func InitUserAPI(db *gorm.DB) handler.UserHandler {
 	userHandler := handler.NewUserHandler(userApplication)
 	return userHandler
 }
+
+// InitJobSalaryAPI is
+func InitJobSalaryAPI(db *gorm.DB) handler.JobSalaryHandler {
+	jobSalaryRepository := mysql.NewJobSalaryRepositoryImpl(db)
+	jobSalaryApplication := application.NewJobSalaryApplication(jobSalaryRepository)
+	jobSalaryHandler := handler.NewJobSalaryHandler(jobSalaryApplication)
+	return jobSalaryHandler
+}
