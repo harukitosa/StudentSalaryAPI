@@ -78,8 +78,10 @@ func main() {
 	})
 	e.GET("/data", userAPI.CreateUser())
 	e.GET("/get", userAPI.GetAllUser())
-	e.GET("/jobSalary/get", jobSalaryAPI.GetAllJobSalary())
-	e.GET("/jobSalary/insert", jobSalaryAPI.CreateJobSalary())
+
+	// JobSalary
+	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary())
+	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary())
 
 	port := os.Getenv("PORT")
 	if port == "" {

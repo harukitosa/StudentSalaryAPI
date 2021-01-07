@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"studentSalaryAPI/application"
+	"studentSalaryAPI/handler/dto"
 	"studentSalaryAPI/model"
 
 	"github.com/labstack/echo/v4"
@@ -21,17 +22,20 @@ func NewJobSalaryHandler(jobSalaryApplication application.JobSalaryApplication) 
 // CreateJobSalary is
 func (h *JobSalaryHandler) CreateJobSalary() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		job := new(dto.JobSalaryBody)
+		c.Bind(job)
+
 		id, err := h.jobSalaryApplication.Insert(model.JobSalary{
-			Name:         "test",
-			CreateDataJS: "12121313414",
-			Detail:       "詳細",
-			Experience:   "2~3年",
-			IsShow:       true,
-			Salary:       2000,
-			Term:         "2weeks",
-			Type:         "ios developer",
-			WorkDays:     "2days",
-			WorkType:     "インターン",
+			Name:         job.Name,
+			CreateDataJS: job.CreateDataJS,
+			Detail:       job.Detail,
+			Experience:   job.Experience,
+			IsShow:       false,
+			Salary:       job.Salary,
+			Term:         job.Term,
+			Type:         job.Type,
+			WorkDays:     job.WorkDays,
+			WorkType:     job.WorkType,
 		})
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
