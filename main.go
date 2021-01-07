@@ -82,6 +82,7 @@ func main() {
 	// JobSalary
 	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary())
 	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary())
+	e.POST("/export/jobSalary", jobSalaryAPI.ExportJobsSalary())
 
 	port := os.Getenv("PORT")
 	if port == "" {
