@@ -1,4 +1,4 @@
-module helloworld
+module studentSalaryAPI
 
 go 1.14
 
