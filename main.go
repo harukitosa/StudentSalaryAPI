@@ -1,47 +1,18 @@
 package main
 
-// [START import]
+// // [START import]
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"studentSalaryAPI/wire"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
+	_ "github.com/mattn/go-sqlite3"
 )
-
-func main() {
-	env := os.Getenv("RUNENV")
-	if env == "production" {
-		db, err := initDB()
-		defer db.Close()
-		if err != nil {
-			log.Fatalf("err: %v", err)
-		}
-
-		cmd := `CREATE TABLE IF NOT EXISTS blog(
-		id INT)`
-
-		_, err = db.Exec(cmd)
-		log.Println("db connection")
-		if err != nil {
-			log.Fatalf("err: %v", err)
-		}
-	}
-
-	http.HandleFunc("/", indexHandler)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
-	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
-	}
-}
 
 func mustGetenv(k string) string {
 	v := os.Getenv(k)
@@ -51,7 +22,7 @@ func mustGetenv(k string) string {
 	return v
 }
 
-func initDB() (*sql.DB, error) {
+func initDB() *sqlx.DB {
 	var (
 		dbUser                 = mustGetenv("DB_USER")
 		dbPwd                  = mustGetenv("DB_PASS")
@@ -64,21 +35,45 @@ func initDB() (*sql.DB, error) {
 		socketDir = "/cloudsql"
 	}
 
-	var dbURI string
-	dbURI = fmt.Sprintf("%s:%s@unix(/%s/%s)/%s?parseTime=true", dbUser, dbPwd, socketDir, instanceConnectionName, dbName)
-
-	dbPool, err := sql.Open("mysql", dbURI)
+	dns := fmt.Sprintf("%s:%s@unix(/%s/%s)/%s?parseTime=true", dbUser, dbPwd, socketDir, instanceConnectionName, dbName)
+	db, err := sqlx.Connect("mysql", dns)
 	if err != nil {
-		return nil, fmt.Errorf("sql.Open: %v", err)
+		log.Fatal(err)
 	}
-
-	return dbPool, nil
+	return db
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
+func initLocalDB() *sqlx.DB {
+	db, err := sqlx.Connect("sqlite3", "__deleteme.db")
+	if err != nil {
+		log.Fatal(err)
 	}
-	fmt.Fprint(w, "student-salary")
+	return db
+}
+
+func main() {
+	e := echo.New()
+	v := os.Getenv("RUNENV")
+	var db *sqlx.DB
+	if v == "production" {
+		db = initDB()
+	} else {
+		db = initLocalDB()
+	}
+	userAPI := wire.InitUserAPI(db)
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
+	})
+	e.GET("/data", userAPI.CreateUser())
+	e.GET("/get", userAPI.GetAllUser())
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8080"
+		log.Printf("Defaulting to port %s", port)
+	}
+	log.Printf("Listening on port %s", port)
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
