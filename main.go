@@ -10,7 +10,8 @@ import (
 	"studentSalaryAPI/wire"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -59,6 +60,15 @@ func initLocalDB() *gorm.DB {
 
 func main() {
 	e := echo.New()
+
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	// localhostの方は消す
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"https://student-salary.com", "http://localhost:3000"},
+		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+	}))
+
 	v := os.Getenv("RUNENV")
 
 	var db *gorm.DB
