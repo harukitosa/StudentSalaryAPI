@@ -1,7 +1,6 @@
 package dto
 
 // JobSalaryBody is user model
-// Salaryはstringで保存していたので一時てきにstringで受け取る
 type JobSalaryBody struct {
 	CreateDataJS string `json:"createDataJS"`
 	Detail       string `json:"detail"`
@@ -15,6 +14,7 @@ type JobSalaryBody struct {
 }
 
 // ExportJobSalaryBody is
+// Salaryはstringで保存していたのでstringで受け取る
 type ExportJobSalaryBody struct {
 	CreateDataJS string `json:"createDataJS"`
 	Detail       string `json:"detail"`

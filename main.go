@@ -49,7 +49,6 @@ func initDB() *gorm.DB {
 }
 
 func initLocalDB() *gorm.DB {
-
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB")
 	if err != nil {
@@ -61,12 +60,14 @@ func initLocalDB() *gorm.DB {
 func main() {
 	e := echo.New()
 	v := os.Getenv("RUNENV")
+
 	var db *gorm.DB
 	if v == "production" {
 		db = initDB()
 	} else {
 		db = initLocalDB()
 	}
+
 	userAPI := wire.InitUserAPI(db)
 	jobSalaryAPI := wire.InitJobSalaryAPI(db)
 	jobSalaryMapAPI := wire.InitJobSalaryMapAPI(db)
@@ -77,16 +78,16 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
 	})
-	e.GET("/data", userAPI.CreateUser())
-	e.GET("/get", userAPI.GetAllUser())
+	e.GET("/data", userAPI.CreateUser)
+	e.GET("/get", userAPI.GetAllUser)
 
 	// JobSalary
-	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary())
-	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary())
-	e.POST("/export/jobSalary", jobSalaryAPI.ExportJobsSalary())
+	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary)
+	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
+	e.POST("/export/jobSalary", jobSalaryAPI.ExportJobsSalary)
 
 	// JobSalaryMap
-	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap())
+	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
 
 	port := os.Getenv("PORT")
 	if port == "" {

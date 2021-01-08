@@ -22,18 +22,57 @@ func NewJobSalaryHandler(jobSalaryApplication application.JobSalaryApplication) 
 }
 
 // CreateJobSalary is
-func (h *JobSalaryHandler) CreateJobSalary() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		job := new(dto.JobSalaryBody)
-		c.Bind(job)
+func (h *JobSalaryHandler) CreateJobSalary(c echo.Context) error {
+	job := new(dto.JobSalaryBody)
+	c.Bind(job)
 
-		id, err := h.jobSalaryApplication.Insert(model.JobSalary{
+	id, err := h.jobSalaryApplication.Insert(model.JobSalary{
+		Name:         job.Name,
+		CreateDataJS: job.CreateDataJS,
+		Detail:       job.Detail,
+		Experience:   job.Experience,
+		IsShow:       false,
+		Salary:       job.Salary,
+		Term:         job.Term,
+		Type:         job.Type,
+		WorkDays:     job.WorkDays,
+		WorkType:     job.WorkType,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, id)
+}
+
+// GetAllJobSalary is
+func (h *JobSalaryHandler) GetAllJobSalary(c echo.Context) error {
+	JobSalary, err := h.jobSalaryApplication.GetAll()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, JobSalary)
+}
+
+// ExportJobsSalary is
+func (h *JobSalaryHandler) ExportJobsSalary(c echo.Context) error {
+	jobs := &[]dto.ExportJobSalaryBody{}
+	err := c.Bind(jobs)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, job := range *jobs {
+		salary, err := strconv.Atoi(job.Salary)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		_, err = h.jobSalaryApplication.Insert(model.JobSalary{
 			Name:         job.Name,
 			CreateDataJS: job.CreateDataJS,
 			Detail:       job.Detail,
 			Experience:   job.Experience,
 			IsShow:       false,
-			Salary:       job.Salary,
+			Salary:       salary,
 			Term:         job.Term,
 			Type:         job.Type,
 			WorkDays:     job.WorkDays,
@@ -42,51 +81,6 @@ func (h *JobSalaryHandler) CreateJobSalary() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-		return c.JSON(http.StatusOK, id)
 	}
-}
-
-// GetAllJobSalary is
-func (h *JobSalaryHandler) GetAllJobSalary() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		JobSalary, err := h.jobSalaryApplication.GetAll()
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
-		}
-		return c.JSON(http.StatusOK, JobSalary)
-	}
-}
-
-// ExportJobsSalary is
-func (h *JobSalaryHandler) ExportJobsSalary() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		jobs := &[]dto.ExportJobSalaryBody{}
-		err := c.Bind(jobs)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for _, job := range *jobs {
-			salary, err := strconv.Atoi(job.Salary)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, err)
-			}
-			_, err = h.jobSalaryApplication.Insert(model.JobSalary{
-				Name:         job.Name,
-				CreateDataJS: job.CreateDataJS,
-				Detail:       job.Detail,
-				Experience:   job.Experience,
-				IsShow:       false,
-				Salary:       salary,
-				Term:         job.Term,
-				Type:         job.Type,
-				WorkDays:     job.WorkDays,
-				WorkType:     job.WorkType,
-			})
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, err)
-			}
-		}
-		return c.JSON(http.StatusOK, len(*jobs))
-	}
+	return c.JSON(http.StatusOK, len(*jobs))
 }

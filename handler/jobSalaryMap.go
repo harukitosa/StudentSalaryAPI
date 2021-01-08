@@ -18,12 +18,10 @@ func NewJobSalaryMapHandler(jobSalaryMapApplication application.JobSalaryMapAppl
 }
 
 // GetJobSalaryMap is
-func (h *JobSalaryMapHandler) GetJobSalaryMap() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		jobSalaryMap, err := h.jobSalaryMapApplication.Select()
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
-		}
-		return c.JSON(http.StatusOK, jobSalaryMap)
+func (h *JobSalaryMapHandler) GetJobSalaryMap(c echo.Context) error {
+	jobSalaryMap, err := h.jobSalaryMapApplication.Select()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
 	}
+	return c.JSON(http.StatusOK, jobSalaryMap)
 }
