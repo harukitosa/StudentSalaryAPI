@@ -9,8 +9,8 @@ type JobSalaryBody struct {
 	Salary       int    `json:"salary"`
 	Term         string `json:"term"`
 	Type         string `json:"type"`
-	WorkDays     string `json:"workDays"`
-	WorkType     string `json:"workType"`
+	WorkDays     string `json:"work_days"`
+	WorkType     string `json:"work_type"`
 }
 
 // ExportJobSalaryBody is
@@ -23,6 +23,6 @@ type ExportJobSalaryBody struct {
 	Salary       string `json:"salary"`
 	Term         string `json:"term"`
 	Type         string `json:"type"`
-	WorkDays     string `json:"workDays"`
-	WorkType     string `json:"workType"`
+	WorkDays     string `json:"work_days"`
+	WorkType     string `json:"work_type"`
 }
