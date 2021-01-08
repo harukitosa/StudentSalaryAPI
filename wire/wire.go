@@ -31,3 +31,11 @@ func InitJobSalaryMapAPI(db *gorm.DB) handler.JobSalaryMapHandler {
 	jobSalaryMapHandler := handler.NewJobSalaryMapHandler(jobSalaryMapApplication)
 	return jobSalaryMapHandler
 }
+
+// InitReviewAPI is
+func InitReviewAPI(db *gorm.DB) handler.ReviewHandler {
+	reviewRepository := mysql.NewReviewRepositoryImpl(db)
+	reviewApplication := application.NewReviewApplication(reviewRepository)
+	reviewHandler := handler.NewReviewHandler(reviewApplication)
+	return reviewHandler
+}

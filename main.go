@@ -71,9 +71,11 @@ func main() {
 	userAPI := wire.InitUserAPI(db)
 	jobSalaryAPI := wire.InitJobSalaryAPI(db)
 	jobSalaryMapAPI := wire.InitJobSalaryMapAPI(db)
+	reviewAPI := wire.InitReviewAPI(db)
 
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.JobSalary{})
+	db.AutoMigrate(&model.Review{})
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
@@ -85,6 +87,10 @@ func main() {
 	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary)
 	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
 	e.POST("/export/jobSalary", jobSalaryAPI.ExportJobsSalary)
+
+	// Review
+	e.GET("/review", reviewAPI.GetAllReview)
+	e.POST("/review", reviewAPI.CreateReview)
 
 	// JobSalaryMap
 	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)

@@ -71,7 +71,7 @@ func (h *JobSalaryHandler) ExportJobsSalary(c echo.Context) error {
 			CreateDataJS: job.CreateDataJS,
 			Detail:       job.Detail,
 			Experience:   job.Experience,
-			IsShow:       false,
+			IsShow:       true,
 			Salary:       salary,
 			Term:         job.Term,
 			Type:         job.Type,
