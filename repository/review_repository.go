@@ -8,4 +8,5 @@ type ReviewRepository interface {
 	SelectAll() ([]model.Review, error)
 	SelectByID(id int) (model.Review, error)
 	SelectByName(name string) ([]model.Review, error)
+	SelectByCreated() ([]model.Review, error)
 }

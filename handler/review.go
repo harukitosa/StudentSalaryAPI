@@ -100,3 +100,12 @@ func (h *ReviewHandler) ExportReview(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, len(*reviews))
 }
+
+// GetReviewByCreated is
+func (h *ReviewHandler) GetReviewByCreated(c echo.Context) error {
+	jobSalaryMap, err := h.reviewApplication.GetByCreated()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, jobSalaryMap)
+}

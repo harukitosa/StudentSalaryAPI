@@ -48,3 +48,10 @@ func (r *ReviewRepositoryImpl) SelectByName(name string) ([]model.Review, error)
 	result := r.db.Where("company_name == ?", name).Find(&reviews)
 	return reviews, result.Error
 }
+
+// SelectByCreated is
+func (r *ReviewRepositoryImpl) SelectByCreated() ([]model.Review, error) {
+	var reviews []model.Review
+	result := r.db.Order("create_date_js desc").Limit(3).Find(&reviews)
+	return reviews, result.Error
+}

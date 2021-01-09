@@ -36,3 +36,8 @@ func (a *ReviewApplication) GetByID(id int) (model.Review, error) {
 func (a *ReviewApplication) GetByName(name string) ([]model.Review, error) {
 	return a.reviewRepository.SelectByName(name)
 }
+
+// GetByCreated is
+func (a *ReviewApplication) GetByCreated() ([]model.Review, error) {
+	return a.reviewRepository.SelectByCreated()
+}
