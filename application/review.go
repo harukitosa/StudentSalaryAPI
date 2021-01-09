@@ -26,3 +26,8 @@ func (a *ReviewApplication) Insert(review model.Review) (int, error) {
 func (a *ReviewApplication) GetAll() ([]model.Review, error) {
 	return a.reviewRepository.SelectAll()
 }
+
+// GetByID is
+func (a *ReviewApplication) GetByID(id int) (model.Review, error) {
+	return a.reviewRepository.SelectByID(id)
+}

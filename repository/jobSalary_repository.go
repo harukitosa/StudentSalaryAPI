@@ -6,5 +6,6 @@ import "studentSalaryAPI/model"
 type JobSalaryRepository interface {
 	Insert(user model.JobSalary) (id int, err error)
 	SelectByID(id int) (model.JobSalary, error)
+	SelectByName(name string) ([]model.JobSalary, error)
 	SelectAll() ([]model.JobSalary, error)
 }

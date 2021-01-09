@@ -100,6 +100,7 @@ func main() {
 
 	// Review
 	e.GET("/review", reviewAPI.GetAllReview)
+	e.GET("/review/:id", reviewAPI.GetReviewByID)
 	e.POST("/review", reviewAPI.CreateReview)
 	e.POST("/reviews", reviewAPI.ExportReview)
 

@@ -34,3 +34,10 @@ func (r *ReviewRepositoryImpl) SelectAll() ([]model.Review, error) {
 	result := r.db.Find(&reviews)
 	return reviews, result.Error
 }
+
+// SelectByID is
+func (r *ReviewRepositoryImpl) SelectByID(id int) (model.Review, error) {
+	var review model.Review
+	result := r.db.First(&review, id)
+	return review, result.Error
+}

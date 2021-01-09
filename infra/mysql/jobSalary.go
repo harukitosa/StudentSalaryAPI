@@ -37,7 +37,14 @@ func (r *JobSalaryRepositoryImpl) SelectByID(id int) (model.JobSalary, error) {
 
 // SelectAll is
 func (r *JobSalaryRepositoryImpl) SelectAll() ([]model.JobSalary, error) {
-	var jobSalarys []model.JobSalary
-	result := r.db.Order("create_data_js desc").Find(&jobSalarys)
-	return jobSalarys, result.Error
+	var jobSalaries []model.JobSalary
+	result := r.db.Order("create_data_js desc").Find(&jobSalaries)
+	return jobSalaries, result.Error
+}
+
+// SelectByName is
+func (r *JobSalaryRepositoryImpl) SelectByName(name string) ([]model.JobSalary, error) {
+	var jobSalaries []model.JobSalary
+	result := r.db.Order("create_data_js desc").Where("name = ?", name).Find(&jobSalaries)
+	return jobSalaries, result.Error
 }

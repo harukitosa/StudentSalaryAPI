@@ -26,3 +26,8 @@ func (u *JobSalaryApplication) Insert(jobSalary model.JobSalary) (int, error) {
 func (u *JobSalaryApplication) GetAll() ([]model.JobSalary, error) {
 	return u.jobSalaryepository.SelectAll()
 }
+
+// GetByName is
+func (u *JobSalaryApplication) GetByName(name string) ([]model.JobSalary, error) {
+	return u.jobSalaryepository.SelectByName(name)
+}

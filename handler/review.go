@@ -43,11 +43,25 @@ func (h *ReviewHandler) CreateReview(c echo.Context) error {
 
 // GetAllReview is
 func (h *ReviewHandler) GetAllReview(c echo.Context) error {
-	Review, err := h.reviewApplication.GetAll()
+	review, err := h.reviewApplication.GetAll()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	return c.JSON(http.StatusOK, Review)
+	return c.JSON(http.StatusOK, review)
+}
+
+// GetReviewByID is
+func (h *ReviewHandler) GetReviewByID(c echo.Context) error {
+	id := c.Param("id")
+	formatID, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	review, err := h.reviewApplication.GetByID(formatID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, review)
 }
 
 // ExportReview is
