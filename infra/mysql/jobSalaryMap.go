@@ -28,3 +28,13 @@ func (r *JobSalaryMapRepositoryImpl) Select() ([]model.JobSalaryMap, error) {
 	}
 	return list, nil
 }
+
+// SelectByCount is
+func (r *JobSalaryMapRepositoryImpl) SelectByCount() ([]model.JobSalaryMap, error) {
+	var list []model.JobSalaryMap
+	tx := r.db.Table("job_salaries").Select("name, max(salary) as max, min(salary) as min, count(*) as count").Group("name").Order("count desc").Limit(3).Find(&list)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return list, nil
+}

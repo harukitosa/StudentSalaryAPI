@@ -38,6 +38,6 @@ func (r *JobSalaryRepositoryImpl) SelectByID(id int) (model.JobSalary, error) {
 // SelectAll is
 func (r *JobSalaryRepositoryImpl) SelectAll() ([]model.JobSalary, error) {
 	var jobSalarys []model.JobSalary
-	result := r.db.Find(&jobSalarys)
+	result := r.db.Order("create_data_js desc").Find(&jobSalarys)
 	return jobSalarys, result.Error
 }

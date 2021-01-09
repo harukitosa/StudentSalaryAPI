@@ -21,3 +21,8 @@ func NewJobSalaryMapApplication(repository repository.JobSalaryMapRepository) Jo
 func (u *JobSalaryMapApplication) Select() ([]model.JobSalaryMap, error) {
 	return u.jobSalaryMaprepository.Select()
 }
+
+// SelectByCount is
+func (u *JobSalaryMapApplication) SelectByCount() ([]model.JobSalaryMap, error) {
+	return u.jobSalaryMaprepository.SelectByCount()
+}

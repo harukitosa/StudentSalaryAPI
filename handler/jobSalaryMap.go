@@ -25,3 +25,12 @@ func (h *JobSalaryMapHandler) GetJobSalaryMap(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, jobSalaryMap)
 }
+
+// GetJobSalaryMapByCount is
+func (h *JobSalaryMapHandler) GetJobSalaryMapByCount(c echo.Context) error {
+	jobSalaryMap, err := h.jobSalaryMapApplication.SelectByCount()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, jobSalaryMap)
+}

@@ -3,8 +3,8 @@ package model
 // JobSalaryMap is user model
 // JobSalaryにうまくまとめられそう
 type JobSalaryMap struct {
-	Name  string
-	Max   int
-	Min   int
-	Count int
+	Name  string `json:"name"`
+	Max   int    `json:"max"`
+	Min   int    `json:"min"`
+	Count int    `json:"count"`
 }
