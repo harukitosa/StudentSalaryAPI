@@ -96,11 +96,12 @@ func main() {
 	// JobSalary
 	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary)
 	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
-	e.POST("/export/jobSalary", jobSalaryAPI.ExportJobsSalary)
+	e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 
 	// Review
 	e.GET("/review", reviewAPI.GetAllReview)
 	e.POST("/review", reviewAPI.CreateReview)
+	e.POST("/reviews", reviewAPI.ExportReview)
 
 	// JobSalaryMap
 	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
