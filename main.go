@@ -14,7 +14,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -50,8 +49,16 @@ func initDB() *gorm.DB {
 }
 
 func initLocalDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+
+	// socketDir, isSet := os.LookupEnv("DB_SOCKET_DIR")
+	// if !isSet {
+	// 	socketDir = "/cloudsql"
+	// }
+
+	dns := "root:@tcp(127.0.0.1:3306)/sample?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB")
+
 	if err != nil {
 		log.Fatal(err)
 	}

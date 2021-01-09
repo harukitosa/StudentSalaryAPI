@@ -45,7 +45,7 @@ func (r *ReviewRepositoryImpl) SelectByID(id int) (model.Review, error) {
 // SelectByName is
 func (r *ReviewRepositoryImpl) SelectByName(name string) ([]model.Review, error) {
 	var reviews []model.Review
-	result := r.db.Where("company_name == ?", name).Find(&reviews)
+	result := r.db.Where("company_name = ?", name).Find(&reviews)
 	return reviews, result.Error
 }
 
