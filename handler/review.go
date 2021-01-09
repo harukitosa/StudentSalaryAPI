@@ -43,6 +43,18 @@ func (h *ReviewHandler) CreateReview(c echo.Context) error {
 
 // GetAllReview is
 func (h *ReviewHandler) GetAllReview(c echo.Context) error {
+	name := c.QueryParam("name")
+	if name != "" {
+		response, err := h.reviewApplication.GetByName(name)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		if len(response) == 0 {
+			return c.JSON(http.StatusNotFound, "not found")
+		}
+		return c.JSON(http.StatusOK, response)
+	}
+
 	review, err := h.reviewApplication.GetAll()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)

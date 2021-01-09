@@ -31,3 +31,8 @@ func (a *ReviewApplication) GetAll() ([]model.Review, error) {
 func (a *ReviewApplication) GetByID(id int) (model.Review, error) {
 	return a.reviewRepository.SelectByID(id)
 }
+
+// GetByName is
+func (a *ReviewApplication) GetByName(name string) ([]model.Review, error) {
+	return a.reviewRepository.SelectByName(name)
+}
