@@ -68,7 +68,7 @@ func (h *JobSalaryHandler) ExportJobsSalary(c echo.Context) error {
 		}
 		_, err = h.jobSalaryApplication.Insert(model.JobSalary{
 			Name:         job.Name,
-			CreateDataJS: job.CreateDataJS,
+			CreateDataJS: strconv.Itoa(job.CreateDataJS),
 			Detail:       job.Detail,
 			Experience:   job.Experience,
 			IsShow:       true,

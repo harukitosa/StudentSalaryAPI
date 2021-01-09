@@ -16,7 +16,7 @@ type JobSalaryBody struct {
 // ExportJobSalaryBody is
 // Salaryはstringで保存していたのでstringで受け取る
 type ExportJobSalaryBody struct {
-	CreateDataJS string `json:"createDataJS"`
+	CreateDataJS int    `json:"create_date"`
 	Detail       string `json:"detail"`
 	Experience   string `json:"experience"`
 	Name         string `json:"name"`
