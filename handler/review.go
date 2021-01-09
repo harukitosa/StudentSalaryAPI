@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"studentSalaryAPI/application"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/handler/dto"
-	"studentSalaryAPI/model"
 
 	"github.com/labstack/echo/v4"
 )
@@ -25,7 +25,7 @@ func NewReviewHandler(ReviewApplication application.ReviewApplication) ReviewHan
 func (h *ReviewHandler) CreateReview(c echo.Context) error {
 	review := new(dto.ReviewBody)
 	c.Bind(review)
-	id, err := h.reviewApplication.Insert(model.Review{
+	id, err := h.reviewApplication.Insert(domain.Review{
 		CompanyName:  review.CompanyName,
 		Content:      review.Content,
 		Link:         review.Link,
@@ -84,7 +84,7 @@ func (h *ReviewHandler) ExportReview(c echo.Context) error {
 		log.Println(err)
 	}
 	for _, review := range *reviews {
-		_, err := h.reviewApplication.Insert(model.Review{
+		_, err := h.reviewApplication.Insert(domain.Review{
 			CompanyName:  review.CompanyName,
 			Content:      review.Content,
 			Link:         review.Link,

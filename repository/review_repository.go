@@ -1,12 +1,12 @@
 package repository
 
-import "studentSalaryAPI/model"
+import "studentSalaryAPI/domain"
 
 // ReviewRepository is interface
 type ReviewRepository interface {
-	Insert(user model.Review) (id int, err error)
-	SelectAll() ([]model.Review, error)
-	SelectByID(id int) (model.Review, error)
-	SelectByName(name string) ([]model.Review, error)
-	SelectByCreated() ([]model.Review, error)
+	Insert(user domain.Review) (id int, err error)
+	SelectAll() ([]domain.Review, error)
+	SelectByID(id int) (domain.Review, error)
+	SelectByName(name string) ([]domain.Review, error)
+	SelectByCreated() ([]domain.Review, error)
 }

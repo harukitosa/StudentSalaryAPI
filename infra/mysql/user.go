@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
 
 	"gorm.io/gorm"
@@ -20,7 +20,7 @@ func NewUserRepositoryImpl(DB *gorm.DB) repository.UserRepository {
 }
 
 // Insert is
-func (r *UserRepositoryImpl) Insert(user model.User) (int, error) {
+func (r *UserRepositoryImpl) Insert(user domain.User) (int, error) {
 	result := r.db.Create(&user)
 	if result.Error != nil {
 		return 0, result.Error
@@ -29,15 +29,15 @@ func (r *UserRepositoryImpl) Insert(user model.User) (int, error) {
 }
 
 // SelectByID is
-func (r *UserRepositoryImpl) SelectByID(id int) (model.User, error) {
-	var user model.User
+func (r *UserRepositoryImpl) SelectByID(id int) (domain.User, error) {
+	var user domain.User
 	tx := r.db.First(&user, id)
 	return user, tx.Error
 }
 
 // SelectAll is
-func (r *UserRepositoryImpl) SelectAll() ([]model.User, error) {
-	var users []model.User
+func (r *UserRepositoryImpl) SelectAll() ([]domain.User, error) {
+	var users []domain.User
 	result := r.db.Find(&users)
 	return users, result.Error
 }

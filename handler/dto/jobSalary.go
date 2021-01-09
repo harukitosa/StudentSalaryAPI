@@ -1,6 +1,6 @@
 package dto
 
-// JobSalaryBody is user model
+// JobSalaryBody is user domain
 type JobSalaryBody struct {
 	CreateDataJS string `json:"createDataJS"`
 	Detail       string `json:"detail"`

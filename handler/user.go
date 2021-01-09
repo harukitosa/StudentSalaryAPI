@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 	"studentSalaryAPI/application"
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 
 	"github.com/labstack/echo/v4"
 )
@@ -20,7 +20,7 @@ func NewUserHandler(userApplication application.UserApplication) UserHandler {
 
 // CreateUser is
 func (h *UserHandler) CreateUser(c echo.Context) error {
-	id, err := h.userApplication.Insert(model.User{Name: "test"})
+	id, err := h.userApplication.Insert(domain.User{Name: "test"})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

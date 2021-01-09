@@ -1,9 +1,9 @@
 package repository
 
-import "studentSalaryAPI/model"
+import "studentSalaryAPI/domain"
 
 // JobSalaryMapRepository is interface
 type JobSalaryMapRepository interface {
-	Select() ([]model.JobSalaryMap, error)
-	SelectByCount() ([]model.JobSalaryMap, error)
+	Select() ([]domain.JobSalaryMap, error)
+	SelectByCount() ([]domain.JobSalaryMap, error)
 }

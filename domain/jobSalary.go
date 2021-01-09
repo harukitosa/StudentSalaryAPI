@@ -1,8 +1,8 @@
-package model
+package domain
 
 import "gorm.io/gorm"
 
-// JobSalary is user model
+// JobSalary is user domain
 type JobSalary struct {
 	gorm.Model
 	CreateDataJS string `json:"create_data_js"`

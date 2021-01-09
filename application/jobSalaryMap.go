@@ -1,7 +1,7 @@
 package application
 
 import (
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
 )
 
@@ -18,11 +18,11 @@ func NewJobSalaryMapApplication(repository repository.JobSalaryMapRepository) Jo
 }
 
 // Select is
-func (u *JobSalaryMapApplication) Select() ([]model.JobSalaryMap, error) {
+func (u *JobSalaryMapApplication) Select() ([]domain.JobSalaryMap, error) {
 	return u.jobSalaryMaprepository.Select()
 }
 
 // SelectByCount is
-func (u *JobSalaryMapApplication) SelectByCount() ([]model.JobSalaryMap, error) {
+func (u *JobSalaryMapApplication) SelectByCount() ([]domain.JobSalaryMap, error) {
 	return u.jobSalaryMaprepository.SelectByCount()
 }

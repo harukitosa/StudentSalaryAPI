@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"studentSalaryAPI/application"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/handler/dto"
-	"studentSalaryAPI/model"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,7 +26,7 @@ func (h *JobSalaryHandler) CreateJobSalary(c echo.Context) error {
 	job := new(dto.JobSalaryBody)
 	c.Bind(job)
 
-	id, err := h.jobSalaryApplication.Insert(model.JobSalary{
+	id, err := h.jobSalaryApplication.Insert(domain.JobSalary{
 		Name:         job.Name,
 		CreateDataJS: job.CreateDataJS,
 		Detail:       job.Detail,
@@ -78,7 +78,7 @@ func (h *JobSalaryHandler) ExportJobsSalary(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
-		_, err = h.jobSalaryApplication.Insert(model.JobSalary{
+		_, err = h.jobSalaryApplication.Insert(domain.JobSalary{
 			Name:         job.Name,
 			CreateDataJS: strconv.Itoa(job.CreateDataJS),
 			Detail:       job.Detail,

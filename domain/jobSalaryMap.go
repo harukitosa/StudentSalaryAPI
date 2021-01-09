@@ -1,6 +1,6 @@
-package model
+package domain
 
-// JobSalaryMap is user model
+// JobSalaryMap is user domain
 // JobSalaryにうまくまとめられそう
 type JobSalaryMap struct {
 	Name  string `json:"name"`

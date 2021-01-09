@@ -1,7 +1,7 @@
 package application
 
 import (
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
 )
 
@@ -18,26 +18,26 @@ func NewReviewApplication(repository repository.ReviewRepository) ReviewApplicat
 }
 
 // Insert is
-func (a *ReviewApplication) Insert(review model.Review) (int, error) {
+func (a *ReviewApplication) Insert(review domain.Review) (int, error) {
 	return a.reviewRepository.Insert(review)
 }
 
 // GetAll is
-func (a *ReviewApplication) GetAll() ([]model.Review, error) {
+func (a *ReviewApplication) GetAll() ([]domain.Review, error) {
 	return a.reviewRepository.SelectAll()
 }
 
 // GetByID is
-func (a *ReviewApplication) GetByID(id int) (model.Review, error) {
+func (a *ReviewApplication) GetByID(id int) (domain.Review, error) {
 	return a.reviewRepository.SelectByID(id)
 }
 
 // GetByName is
-func (a *ReviewApplication) GetByName(name string) ([]model.Review, error) {
+func (a *ReviewApplication) GetByName(name string) ([]domain.Review, error) {
 	return a.reviewRepository.SelectByName(name)
 }
 
 // GetByCreated is
-func (a *ReviewApplication) GetByCreated() ([]model.Review, error) {
+func (a *ReviewApplication) GetByCreated() ([]domain.Review, error) {
 	return a.reviewRepository.SelectByCreated()
 }

@@ -1,7 +1,7 @@
 package application
 
 import (
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
 )
 
@@ -18,11 +18,11 @@ func NewUserApplication(repository repository.UserRepository) UserApplication {
 }
 
 // Insert is
-func (u *UserApplication) Insert(user model.User) (int, error) {
+func (u *UserApplication) Insert(user domain.User) (int, error) {
 	return u.useRepository.Insert(user)
 }
 
 // GetAll is
-func (u *UserApplication) GetAll() ([]model.User, error) {
+func (u *UserApplication) GetAll() ([]domain.User, error) {
 	return u.useRepository.SelectAll()
 }

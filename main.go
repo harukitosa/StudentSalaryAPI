@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/wire"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -90,9 +90,9 @@ func main() {
 	jobSalaryMapAPI := wire.InitJobSalaryMapAPI(db)
 	reviewAPI := wire.InitReviewAPI(db)
 
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.JobSalary{})
-	db.AutoMigrate(&model.Review{})
+	db.AutoMigrate(&domain.User{})
+	db.AutoMigrate(&domain.JobSalary{})
+	db.AutoMigrate(&domain.Review{})
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})

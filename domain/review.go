@@ -1,8 +1,8 @@
-package model
+package domain
 
 import "gorm.io/gorm"
 
-// Review is user model
+// Review is user domain
 type Review struct {
 	gorm.Model
 	CompanyName  string `json:"company_name"`

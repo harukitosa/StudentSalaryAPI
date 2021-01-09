@@ -1,7 +1,7 @@
 package application
 
 import (
-	"studentSalaryAPI/model"
+	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
 )
 
@@ -18,16 +18,16 @@ func NewJobSalaryApplication(repository repository.JobSalaryRepository) JobSalar
 }
 
 // Insert is
-func (u *JobSalaryApplication) Insert(jobSalary model.JobSalary) (int, error) {
+func (u *JobSalaryApplication) Insert(jobSalary domain.JobSalary) (int, error) {
 	return u.jobSalaryepository.Insert(jobSalary)
 }
 
 // GetAll is
-func (u *JobSalaryApplication) GetAll() ([]model.JobSalary, error) {
+func (u *JobSalaryApplication) GetAll() ([]domain.JobSalary, error) {
 	return u.jobSalaryepository.SelectAll()
 }
 
 // GetByName is
-func (u *JobSalaryApplication) GetByName(name string) ([]model.JobSalary, error) {
+func (u *JobSalaryApplication) GetByName(name string) ([]domain.JobSalary, error) {
 	return u.jobSalaryepository.SelectByName(name)
 }
