@@ -26,3 +26,11 @@ type ExportJobSalaryBody struct {
 	WorkDays     string `json:"work_days"`
 	WorkType     string `json:"work_type"`
 }
+
+// JobSalaryStatistics is
+type JobSalaryStatistics struct {
+	Count        int `json:"count"`
+	CompanyCount int `json:"company_count"`
+	Avg          int `json:"avg"`
+	Mid          int `json:"mid"`
+}

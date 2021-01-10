@@ -65,6 +65,16 @@ func (h *JobSalaryHandler) GetAllJobSalary(c echo.Context) error {
 	return c.JSON(http.StatusOK, JobSalary)
 }
 
+// GetStatistics is
+func (h *JobSalaryHandler) GetStatistics(c echo.Context) error {
+	count, avg, mid, companyCount, err := h.jobSalaryApplication.GetStatistics()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	s := dto.JobSalaryStatistics{Count: count, CompanyCount: companyCount, Avg: avg, Mid: mid}
+	return c.JSON(http.StatusOK, s)
+}
+
 // ExportJobsSalary is
 func (h *JobSalaryHandler) ExportJobsSalary(c echo.Context) error {
 	jobs := &[]dto.ExportJobSalaryBody{}

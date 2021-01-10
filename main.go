@@ -71,18 +71,22 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	// localhostの方は消す
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://student-salary.com", "http://localhost:3000"},
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
-	}))
 
 	v := os.Getenv("RUNENV")
 
 	var db *gorm.DB
 	if v == "production" {
 		db = initDB()
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"https://student-salary.com"},
+			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		}))
 	} else {
 		db = initLocalDB()
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"http://localhost:8080"},
+			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		}))
 	}
 
 	userAPI := wire.InitUserAPI(db)
@@ -102,6 +106,7 @@ func main() {
 
 	// JobSalary
 	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary)
+	e.GET("/jobSalary/statistics", jobSalaryAPI.GetStatistics)
 	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
 	e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 

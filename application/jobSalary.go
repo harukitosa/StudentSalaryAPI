@@ -3,6 +3,7 @@ package application
 import (
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
+	"studentSalaryAPI/service"
 )
 
 // JobSalaryApplication is
@@ -30,4 +31,18 @@ func (u *JobSalaryApplication) GetAll() ([]domain.JobSalary, error) {
 // GetByName is
 func (u *JobSalaryApplication) GetByName(name string) ([]domain.JobSalary, error) {
 	return u.jobSalaryepository.SelectByName(name)
+}
+
+// GetStatistics will return statistics of jobSalary
+func (u *JobSalaryApplication) GetStatistics() (int, int, int, int, error) {
+	list, err := u.jobSalaryepository.SelectAll()
+	if err != nil {
+		return 0, 0, 0, 0, err
+	}
+	jobSalaryService := new(service.JobSalaryService)
+	count := len(list)
+	avg := jobSalaryService.GetAvg(list)
+	mid := jobSalaryService.GetMid(list)
+	companyCount := jobSalaryService.GetCountByCompanyName(list)
+	return count, avg, mid, companyCount, nil
 }
