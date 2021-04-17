@@ -121,6 +121,8 @@ func main() {
 	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
 	e.GET("/jobSalaryMap/count", jobSalaryMapAPI.GetJobSalaryMapByCount)
 
+	e.GET("/jobSalaryMapData", jobSalaryAPI.GetJobsSalaryMap)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

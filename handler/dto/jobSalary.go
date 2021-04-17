@@ -34,3 +34,9 @@ type JobSalaryStatistics struct {
 	Avg          int `json:"avg"`
 	Mid          int `json:"mid"`
 }
+
+// Map
+type Map struct {
+	M   map[string]int `json:"map"`
+	Len int            `json:"len"`
+}

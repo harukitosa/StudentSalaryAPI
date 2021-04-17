@@ -106,3 +106,11 @@ func (h *JobSalaryHandler) ExportJobsSalary(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, len(*jobs))
 }
+
+func (h *JobSalaryHandler) GetJobsSalaryMap(c echo.Context) error {
+	m, l, err := h.jobSalaryApplication.GetSalaryMap()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, dto.Map{M: m, Len: l})
+}

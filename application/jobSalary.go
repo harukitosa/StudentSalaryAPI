@@ -46,3 +46,14 @@ func (u *JobSalaryApplication) GetStatistics() (int, int, int, int, error) {
 	companyCount := jobSalaryService.GetCountByCompanyName(list)
 	return count, avg, mid, companyCount, nil
 }
+
+// GetSalaryMap is get salary map
+func (u *JobSalaryApplication) GetSalaryMap() (map[string]int, int, error) {
+	list, err := u.jobSalaryepository.SelectAll()
+	if err != nil {
+		return nil, 0, err
+	}
+	jobSalaryService := new(service.JobSalaryService)
+	m := jobSalaryService.ToSalaryMap(list)
+	return m, len(list), nil
+}
