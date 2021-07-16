@@ -16,5 +16,5 @@ type ReviewRepository interface {
 	Insert(review Review) (id int, err error)
 	SelectByID(id int) (Review, error)
 	SelectByName(name string) ([]Review, error)
-	SelectAll([]Review, error)
+	SelectAll() ([]Review, error)
 }

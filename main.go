@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"os"
 	"studentSalaryAPI/domain"
+	"studentSalaryAPI/handler"
 	"studentSalaryAPI/infra"
-
-	// "studentSalaryAPI/wire"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -89,6 +88,7 @@ func main() {
 	workdata := infra.NewWorkDataInfra(db)
 	review.Insert(domain.Review{})
 	workdata.Insert(domain.WorkData{})
+	reviewHandler := handler.NewReviewHandler(review)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
@@ -100,8 +100,8 @@ func main() {
 	// e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
 	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 
-	// // Review
-	// e.GET("/review", reviewAPI.GetAllReview)
+	// Review
+	e.GET("/review", reviewHandler.GetAllReview)
 	// e.GET("/review/:id", reviewAPI.GetReviewByID)
 	// e.GET("/review/created", reviewAPI.GetReviewByCreated)
 	// e.POST("/review", reviewAPI.CreateReview)
