@@ -102,7 +102,7 @@ func main() {
 
 	// Review
 	e.GET("/review", reviewHandler.GetAllReview)
-	// e.GET("/review/:id", reviewAPI.GetReviewByID)
+	e.GET("/review/:id", reviewHandler.GetReviewByID)
 	// e.GET("/review/created", reviewAPI.GetReviewByCreated)
 	// e.POST("/review", reviewAPI.CreateReview)
 	// e.POST("/reviews", reviewAPI.ExportReview)

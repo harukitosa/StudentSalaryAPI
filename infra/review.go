@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"log"
 	"studentSalaryAPI/domain"
 	"time"
 
@@ -49,7 +48,18 @@ func (r *reviewInfra) Insert(review domain.Review) (id int, err error) {
 }
 
 func (r *reviewInfra) SelectByID(id int) (domain.Review, error) {
-	return domain.Review{}, nil
+	query := `SELECT * FROM reviews WHERE id=?`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return domain.Review{}, nil
+	}
+	row := stmt.QueryRow(id)
+	review := new(review)
+	err = row.Scan(&review)
+	if err != nil {
+		return domain.Review{}, err
+	}
+	return review.toDomain(), nil
 }
 
 func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
@@ -59,7 +69,7 @@ func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
 func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
 	rows, err := r.db.Queryx("SELECT * FROM reviews")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var reviews []review
@@ -67,9 +77,8 @@ func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
 		review := new(review)
 		err := rows.StructScan(&review)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
-		log.Println(review)
 		reviews = append(reviews, *review)
 	}
 
@@ -77,6 +86,5 @@ func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
 	for _, v := range reviews {
 		reviewsList = append(reviewsList, v.toDomain())
 	}
-	log.Println(reviewsList)
 	return reviewsList, nil
 }
