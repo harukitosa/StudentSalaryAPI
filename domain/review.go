@@ -1,16 +1,20 @@
 package domain
 
-import "gorm.io/gorm"
-
-// Review is user domain
+// WorkReview is student review
 type Review struct {
-	gorm.Model
-	CompanyName  string `json:"company_name"`
-	Content      string `json:"content"`
-	CreateDateJS string `json:"create_date"`
-	Link         string `json:"link"`
-	Reasons      string `json:"reasons"`
-	Report       string `json:"report"`
-	Skill        string `json:"skill"`
-	UserName     string `json:"user_name"`
+	CompanyName  string
+	Content      string
+	CreateDateJS string
+	Link         string
+	Reasons      string
+	Report       string
+	Skill        string
+	UserName     string
+}
+
+type ReviewRepository interface {
+	Insert(review Review) (id int, err error)
+	SelectByID(id int) (Review, error)
+	SelectByName(name string) ([]Review, error)
+	SelectAll([]Review, error)
 }
