@@ -101,7 +101,7 @@ func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
 	var items []review
 	err = stmt.Select(&items, args)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	log.Println(items)
 

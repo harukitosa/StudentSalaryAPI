@@ -25,7 +25,24 @@ func (r *workdataInfra) SelectByID(id int) (domain.WorkData, error) {
 }
 
 func (r *workdataInfra) SelectByName(name string) ([]domain.WorkData, error) {
-	return nil, nil
+	query := `SELECT * FROM job_salaries WHERE name=:name`
+	stmt, err := r.db.PrepareNamed(query)
+	if err != nil {
+		return nil, nil
+	}
+	args := map[string]interface{}{
+		"name": name,
+	}
+	var items []workdata
+	err = stmt.Select(&items, args)
+	if err != nil {
+		return nil, err
+	}
+	var workdataList []domain.WorkData
+	for _, v := range items {
+		workdataList = append(workdataList, v.toDomain())
+	}
+	return workdataList, nil
 }
 
 func (r *workdataInfra) SelectAll() ([]domain.WorkData, error) {

@@ -16,7 +16,28 @@ func NewWorkDataHandler(repository domain.WorkDataRepository) *workdataHandler {
 }
 
 func (r *workdataHandler) GetReview(c echo.Context) error {
+	name := c.QueryParam("name")
+	if name == "" {
+		return r.GetAllReview(c)
+	}
+	return r.GetReviewByName(c)
+}
+
+func (r *workdataHandler) GetAllReview(c echo.Context) error {
 	data, err := r.repository.SelectAll()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	body := make([]workDataBody, len(data))
+	for i, v := range data {
+		body[i] = createWorkDataBody(v)
+	}
+	return c.JSON(http.StatusOK, body)
+}
+
+func (r *workdataHandler) GetReviewByName(c echo.Context) error {
+	name := c.QueryParam("name")
+	data, err := r.repository.SelectByName(name)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
