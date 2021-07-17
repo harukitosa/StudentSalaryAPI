@@ -84,15 +84,16 @@ func main() {
 	}
 
 	review := infra.NewReviewInfra(db)
-	// workdata := infra.NewWorkDataInfra(db)
+	workdata := infra.NewWorkDataInfra(db)
 	reviewHandler := handler.NewReviewHandler(review)
+	workdataHandler := handler.NewWorkDataHandler(workdata)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
 	})
 
 	// // JobSalary
-	// e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary)
+	e.GET("/jobSalary", workdataHandler.GetReview)
 	// e.GET("/jobSalary/statistics", jobSalaryAPI.GetStatistics)
 	// e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
 	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)

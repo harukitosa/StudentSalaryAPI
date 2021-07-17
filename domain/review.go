@@ -4,6 +4,7 @@ package domain
 type Review struct {
 	ID           int
 	CompanyName  string
+	Detail       string
 	Content      string
 	CreateDateJS string
 	Link         string
