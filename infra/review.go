@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"log"
 	"studentSalaryAPI/domain"
 	"time"
 
@@ -102,6 +103,7 @@ func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
 	if err != nil {
 		return nil, nil
 	}
+	log.Println(items)
 
 	var reviewsList []domain.Review
 	for _, v := range items {

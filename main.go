@@ -98,7 +98,7 @@ func main() {
 	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 
 	// Review
-	e.GET("/review", reviewHandler.GetAllReview)
+	e.GET("/review", reviewHandler.GetReview)
 	e.GET("/review/:id", reviewHandler.GetReviewByID)
 	e.POST("/review", reviewHandler.CreateReview)
 	// e.GET("/review/created", reviewAPI.GetReviewByCreated)

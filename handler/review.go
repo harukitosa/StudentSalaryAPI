@@ -16,8 +16,29 @@ func NewReviewHandler(repository domain.ReviewRepository) *reviewHandler {
 	return &reviewHandler{repository: repository}
 }
 
+func (r *reviewHandler) GetReview(c echo.Context) error {
+	name := c.QueryParam("name")
+	if name == "" {
+		return r.GetAllReview(c)
+	}
+	return r.SelectByName(c)
+}
+
 func (r *reviewHandler) GetAllReview(c echo.Context) error {
 	reviews, err := r.repository.SelectAll()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	body := make([]reviewBody, len(reviews))
+	for i, v := range reviews {
+		body[i] = createBody(v)
+	}
+	return c.JSON(http.StatusOK, body)
+}
+
+func (r *reviewHandler) SelectByName(c echo.Context) error {
+	name := c.QueryParam("name")
+	reviews, err := r.repository.SelectByName(name)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
