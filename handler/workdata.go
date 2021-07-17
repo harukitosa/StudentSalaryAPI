@@ -71,6 +71,90 @@ func (r *workdataHandler) CreateWorkData(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, id)
 }
+func (r *workdataHandler) GetAggregateWorkData(c echo.Context) error {
+	data, err := r.repository.SelectAll()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, aggregateWorkData{
+		Avg:          getAvg(data),
+		Mid:          getMid(data),
+		CompanyCount: getCountByCompanyName(data),
+		Count:        len(data),
+	})
+}
+
+func getAvg(list []domain.WorkData) int {
+	avg := 0
+	for _, v := range list {
+		avg += v.Salary
+	}
+	return avg / len(list)
+}
+
+func getMid(list []domain.WorkData) int {
+	size := len(list)
+	if size%2 == 0 {
+		return (list[size/2].Salary + list[size/2-1].Salary) / 2
+	}
+	return list[size/2].Salary
+}
+
+func getCountByCompanyName(list []domain.WorkData) int {
+	m := map[string]int{}
+	count := 0
+	for _, v := range list {
+		if m[v.Name] == 0 {
+			count++
+		}
+		m[v.Name] = 1
+	}
+	return count
+}
+
+func toSalaryMap(list []domain.WorkData) map[string]int {
+	m := map[string]int{}
+
+	for _, v := range list {
+		s := v.Salary
+		switch {
+		case s < 1000:
+			m["0"]++
+			break
+		case 1000 <= s && s < 2000:
+			m["1000"]++
+			break
+		case 2000 <= s && s < 3000:
+			m["2000"]++
+			break
+		case 3000 <= s && s < 4000:
+			m["3000"]++
+			break
+		case 4000 <= s && s < 5000:
+			m["4000"]++
+			break
+		case 5000 <= s && s < 6000:
+			m["5000"]++
+			break
+		case 6000 <= s && s < 7000:
+			m["6000"]++
+			break
+		case 7000 <= s && s < 8000:
+			m["7000"]++
+			break
+		case 8000 <= s && s < 9000:
+			m["8000"]++
+			break
+		case 9000 <= s && s < 10000:
+			m["9000"]++
+			break
+		default:
+			m["10000"]++
+			break
+		}
+	}
+	return m
+}
 
 type workDataBody struct {
 	ID           int    `json:"id"`
@@ -100,4 +184,11 @@ func createWorkDataBody(workdata domain.WorkData) workDataBody {
 		WorkDays:     workdata.WorkDays,
 		WorkType:     workdata.WorkType,
 	}
+}
+
+type aggregateWorkData struct {
+	Count        int `json:"count"`
+	CompanyCount int `json:"company_count"`
+	Avg          int `json:"avg"`
+	Mid          int `json:"mid"`
 }
