@@ -48,6 +48,30 @@ func (r *workdataHandler) GetReviewByName(c echo.Context) error {
 	return c.JSON(http.StatusOK, body)
 }
 
+func (r *workdataHandler) CreateWorkData(c echo.Context) error {
+	workdata := new(workDataBody)
+	err := c.Bind(workdata)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	id, err := r.repository.Insert(domain.WorkData{
+		CreateDataJS: workdata.CreateDataJS,
+		Detail:       workdata.Detail,
+		Experience:   workdata.Experience,
+		IsShow:       workdata.IsShow,
+		Name:         workdata.Name,
+		Salary:       workdata.Salary,
+		Term:         workdata.Term,
+		Type:         workdata.Type,
+		WorkDays:     workdata.WorkDays,
+		WorkType:     workdata.WorkType,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, id)
+}
+
 type workDataBody struct {
 	ID           int    `json:"id"`
 	CreateDataJS string `json:"create_data_js"`

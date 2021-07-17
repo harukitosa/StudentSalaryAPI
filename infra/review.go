@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"log"
 	"studentSalaryAPI/domain"
 	"time"
 
@@ -61,12 +60,12 @@ func (r *reviewInfra) Insert(review domain.Review) (id int, err error) {
 			"user_name":      review.UserName,
 		})
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	var i int64
 	i, err = res.LastInsertId()
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	// あんまよくない
 	return int(i), nil
@@ -103,8 +102,6 @@ func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println(items)
-
 	var reviewsList []domain.Review
 	for _, v := range items {
 		reviewsList = append(reviewsList, v.toDomain())

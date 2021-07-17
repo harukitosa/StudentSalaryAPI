@@ -95,7 +95,7 @@ func main() {
 	// // JobSalary
 	e.GET("/jobSalary", workdataHandler.GetReview)
 	// e.GET("/jobSalary/statistics", jobSalaryAPI.GetStatistics)
-	// e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
+	e.POST("/jobSalary", workdataHandler.CreateWorkData)
 	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 
 	// Review
