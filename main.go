@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"studentSalaryAPI/domain"
 	"studentSalaryAPI/handler"
 	"studentSalaryAPI/infra"
 
@@ -85,9 +84,7 @@ func main() {
 	}
 
 	review := infra.NewReviewInfra(db)
-	workdata := infra.NewWorkDataInfra(db)
-	review.Insert(domain.Review{})
-	workdata.Insert(domain.WorkData{})
+	// workdata := infra.NewWorkDataInfra(db)
 	reviewHandler := handler.NewReviewHandler(review)
 
 	e.GET("/", func(c echo.Context) error {
@@ -103,6 +100,7 @@ func main() {
 	// Review
 	e.GET("/review", reviewHandler.GetAllReview)
 	e.GET("/review/:id", reviewHandler.GetReviewByID)
+	e.POST("/review", reviewHandler.CreateReview)
 	// e.GET("/review/created", reviewAPI.GetReviewByCreated)
 	// e.POST("/review", reviewAPI.CreateReview)
 	// e.POST("/reviews", reviewAPI.ExportReview)

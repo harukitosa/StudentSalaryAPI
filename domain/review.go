@@ -2,6 +2,7 @@ package domain
 
 // WorkReview is student review
 type Review struct {
+	ID           int
 	CompanyName  string
 	Content      string
 	CreateDateJS string

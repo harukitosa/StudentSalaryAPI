@@ -21,7 +21,11 @@ func (r *reviewHandler) GetAllReview(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	return c.JSON(http.StatusOK, reviews)
+	body := make([]reviewBody, len(reviews))
+	for i, v := range reviews {
+		body[i] = createBody(v)
+	}
+	return c.JSON(http.StatusOK, body)
 }
 
 func (r *reviewHandler) GetReviewByID(c echo.Context) error {
@@ -34,5 +38,61 @@ func (r *reviewHandler) GetReviewByID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
-	return c.JSON(http.StatusOK, review)
+	return c.JSON(http.StatusOK, createBody(review))
+}
+
+func (h *reviewHandler) CreateReview(c echo.Context) error {
+	review := new(reviewPostBody)
+	c.Bind(review)
+	id, err := h.repository.Insert(domain.Review{
+		CompanyName:  review.CompanyName,
+		Content:      review.Content,
+		Link:         review.Link,
+		Reasons:      review.Reasons,
+		Report:       review.Report,
+		Skill:        review.Skill,
+		CreateDateJS: review.CreateDateJS,
+		UserName:     review.UserName,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, id)
+}
+
+type reviewPostBody struct {
+	CompanyName  string `json:"company_name"`
+	Content      string `json:"content"`
+	CreateDateJS string `json:"create_date"`
+	Link         string `json:"link"`
+	Reasons      string `json:"reasons"`
+	Report       string `json:"report"`
+	Skill        string `json:"skill"`
+	UserName     string `json:"user_name"`
+}
+
+type reviewBody struct {
+	ID           int    `json:"ID"`
+	CompanyName  string `json:"company_name"`
+	Content      string `json:"content"`
+	CreateDateJS string `json:"create_date"`
+	Link         string `json:"link"`
+	Reasons      string `json:"reasons"`
+	Report       string `json:"report"`
+	Skill        string `json:"skill"`
+	UserName     string `json:"user_name"`
+}
+
+func createBody(review domain.Review) reviewBody {
+	return reviewBody{
+		ID:           review.ID,
+		CompanyName:  review.CompanyName,
+		Content:      review.Content,
+		CreateDateJS: review.CreateDateJS,
+		Link:         review.Link,
+		Reasons:      review.Reasons,
+		Report:       review.Report,
+		Skill:        review.Skill,
+		UserName:     review.UserName,
+	}
 }
