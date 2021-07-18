@@ -6,15 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"studentSalaryAPI/domain"
-	"studentSalaryAPI/wire"
+	"studentSalaryAPI/handler"
+	"studentSalaryAPI/infra"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 func mustGetenv(k string) string {
@@ -25,7 +24,7 @@ func mustGetenv(k string) string {
 	return v
 }
 
-func initDB() *gorm.DB {
+func initDB() (*sqlx.DB, error) {
 	var (
 		dbUser                 = mustGetenv("DB_USER")
 		dbPwd                  = mustGetenv("DB_PASS")
@@ -39,30 +38,20 @@ func initDB() *gorm.DB {
 	}
 
 	dns := fmt.Sprintf("%s:%s@unix(/%s/%s)/%s?parseTime=true", dbUser, dbPwd, socketDir, instanceConnectionName, dbName)
-	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
-	db.Set("gorm:table_options", "ENGINE=InnoDB")
-
+	db, err := sqlx.Open("mysql", dns)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
-func initLocalDB() *gorm.DB {
-
-	// socketDir, isSet := os.LookupEnv("DB_SOCKET_DIR")
-	// if !isSet {
-	// 	socketDir = "/cloudsql"
-	// }
-
+func initLocalDB() (*sqlx.DB, error) {
 	dns := "root:@tcp(127.0.0.1:3306)/sample?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
-	db.Set("gorm:table_options", "ENGINE=InnoDB")
-
+	db, err := sqlx.Open("mysql", dns)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
 func main() {
@@ -74,54 +63,53 @@ func main() {
 
 	v := os.Getenv("RUNENV")
 
-	var db *gorm.DB
+	var db *sqlx.DB
+	var err error
 	if v == "production" {
-		db = initDB()
+		db, err = initDB()
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: []string{"https://student-salary.com"},
 			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 		}))
 	} else {
-		db = initLocalDB()
+		db, err = initLocalDB()
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: []string{"http://localhost:3000"},
 			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 		}))
 	}
 
-	userAPI := wire.InitUserAPI(db)
-	jobSalaryAPI := wire.InitJobSalaryAPI(db)
-	jobSalaryMapAPI := wire.InitJobSalaryMapAPI(db)
-	reviewAPI := wire.InitReviewAPI(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	db.AutoMigrate(&domain.User{})
-	db.AutoMigrate(&domain.JobSalary{})
-	db.AutoMigrate(&domain.Review{})
+	review := infra.NewReviewInfra(db)
+	workdata := infra.NewWorkDataInfra(db)
+	reviewHandler := handler.NewReviewHandler(review)
+	workdataHandler := handler.NewWorkDataHandler(workdata)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
 	})
-	e.GET("/data", userAPI.CreateUser)
-	e.GET("/get", userAPI.GetAllUser)
 
-	// JobSalary
-	e.GET("/jobSalary", jobSalaryAPI.GetAllJobSalary)
-	e.GET("/jobSalary/statistics", jobSalaryAPI.GetStatistics)
-	e.POST("/jobSalary", jobSalaryAPI.CreateJobSalary)
-	e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
+	// // JobSalary
+	e.GET("/jobSalary", workdataHandler.GetReview)
+	e.GET("/jobSalary/statistics", workdataHandler.GetAggregateWorkData)
+	e.POST("/jobSalary", workdataHandler.CreateWorkData)
+	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 
 	// Review
-	e.GET("/review", reviewAPI.GetAllReview)
-	e.GET("/review/:id", reviewAPI.GetReviewByID)
-	e.GET("/review/created", reviewAPI.GetReviewByCreated)
-	e.POST("/review", reviewAPI.CreateReview)
-	e.POST("/reviews", reviewAPI.ExportReview)
+	e.GET("/review", reviewHandler.GetReview)
+	e.GET("/review/:id", reviewHandler.GetReviewByID)
+	e.POST("/review", reviewHandler.CreateReview)
+	e.GET("/review/created", reviewHandler.GetReviewByCreated)
+	// e.POST("/reviews", reviewAPI.ExportReview)
 
-	// JobSalaryMap
-	e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
-	e.GET("/jobSalaryMap/count", jobSalaryMapAPI.GetJobSalaryMapByCount)
+	// // JobSalaryMap
+	// e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
+	// e.GET("/jobSalaryMap/count", jobSalaryMapAPI.GetJobSalaryMapByCount)
 
-	e.GET("/jobSalaryMapData", jobSalaryAPI.GetJobsSalaryMap)
+	// e.GET("/jobSalaryMapData", jobSalaryAPI.GetJobsSalaryMap)
 
 	port := os.Getenv("PORT")
 	if port == "" {
