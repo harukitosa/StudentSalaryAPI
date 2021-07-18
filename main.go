@@ -95,7 +95,6 @@ func main() {
 	// // JobSalary
 	e.GET("/jobSalary", workdataHandler.GetReview)
 	e.GET("/jobSalary/statistics", workdataHandler.GetAggregateWorkData)
-	// e.GET("/jobSalary/statistics", jobSalaryAPI.GetStatistics)
 	e.POST("/jobSalary", workdataHandler.CreateWorkData)
 	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
 
@@ -103,8 +102,7 @@ func main() {
 	e.GET("/review", reviewHandler.GetReview)
 	e.GET("/review/:id", reviewHandler.GetReviewByID)
 	e.POST("/review", reviewHandler.CreateReview)
-	// e.GET("/review/created", reviewAPI.GetReviewByCreated)
-	// e.POST("/review", reviewAPI.CreateReview)
+	e.GET("/review/created", reviewHandler.GetReviewByCreated)
 	// e.POST("/reviews", reviewAPI.ExportReview)
 
 	// // JobSalaryMap

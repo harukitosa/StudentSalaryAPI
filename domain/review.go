@@ -19,4 +19,5 @@ type ReviewRepository interface {
 	SelectByID(id int) (Review, error)
 	SelectByName(name string) ([]Review, error)
 	SelectAll() ([]Review, error)
+	GetNewReview() ([]Review, error)
 }

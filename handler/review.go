@@ -81,6 +81,18 @@ func (h *reviewHandler) CreateReview(c echo.Context) error {
 	return c.JSON(http.StatusOK, id)
 }
 
+func (r *reviewHandler) GetReviewByCreated(c echo.Context) error {
+	reviews, err := r.repository.GetNewReview()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	body := make([]reviewBody, len(reviews))
+	for i, v := range reviews {
+		body[i] = createBody(v)
+	}
+	return c.JSON(http.StatusOK, body)
+}
+
 type reviewPostBody struct {
 	CompanyName  string `json:"company_name"`
 	Content      string `json:"content"`

@@ -131,3 +131,28 @@ func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
 	}
 	return reviewsList, nil
 }
+
+func (r *reviewInfra) GetNewReview() ([]domain.Review, error) {
+	rows, err := r.db.Queryx(`
+		select * from reviews order by created_at DESC limit 3
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	var reviews []review
+	for rows.Next() {
+		review := new(review)
+		err := rows.StructScan(&review)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, *review)
+	}
+
+	var reviewsList []domain.Review
+	for _, v := range reviews {
+		reviewsList = append(reviewsList, v.toDomain())
+	}
+	return reviewsList, nil
+}
