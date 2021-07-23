@@ -15,6 +15,19 @@ type NewWorkData struct {
 	WorkType     *string `json:"workType"`
 }
 
+type Review struct {
+	ID           string  `json:"id"`
+	CompanyName  *string `json:"company_name"`
+	Detail       *string `json:"detail"`
+	Content      *string `json:"content"`
+	CreateDataJs *string `json:"create_data_js"`
+	Link         *string `json:"link"`
+	Reasons      *string `json:"reasons"`
+	Report       *string `json:"report"`
+	Skill        *string `json:"skill"`
+	UserName     *string `json:"user_name"`
+}
+
 type WorkData struct {
 	ID           string  `json:"id"`
 	CreateDataJs *string `json:"create_data_js"`

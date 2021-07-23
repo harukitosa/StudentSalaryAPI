@@ -6,26 +6,23 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/graph/model"
 )
 
 func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWorkData) (*model.WorkData, error) {
-	log.Printf("%+v\n", input)
-	workdata := domain.WorkData{
-		Name:         *input.Name,
-		Salary:       input.Salary,
-		CreateDataJS: *input.CreateDataJs,
-		Detail:       *input.Detail,
-		Experience:   *input.Experience,
-		IsShow:       *input.IsShow,
-		Term:         *input.Term,
-		Type:         *input.Type,
-		WorkDays:     *input.Workdays,
-		WorkType:     *input.WorkType,
-	}
+	workdata := domain.NewWorkData(
+		input.CreateDataJs,
+		input.Detail,
+		input.Experience,
+		input.IsShow,
+		input.Name,
+		&input.Salary,
+		input.Term,
+		input.Type,
+		input.Workdays,
+		input.WorkType)
 	id, err := r.Resolver.Workdata.Insert(workdata)
 	if err != nil {
 		return nil, err
@@ -65,6 +62,29 @@ func (r *queryResolver) Workdata(ctx context.Context) ([]*model.WorkData, error)
 			Type:         &v.Type,
 			Workdays:     &v.WorkDays,
 			WorkType:     &v.WorkType,
+		})
+	}
+	return dto, nil
+}
+
+func (r *queryResolver) Review(ctx context.Context) ([]*model.Review, error) {
+	reviews, err := r.Resolver.Review.SelectAll()
+	if err != nil {
+		return nil, err
+	}
+	var dto []*model.Review
+	for _, v := range reviews {
+		dto = append(dto, &model.Review{
+			ID:           fmt.Sprint(v.ID),
+			CompanyName:  &v.CompanyName,
+			Detail:       &v.Detail,
+			Content:      &v.Content,
+			CreateDataJs: &v.CreateDateJS,
+			Link:         &v.Link,
+			Reasons:      &v.Reasons,
+			Report:       &v.Report,
+			Skill:        &v.Skill,
+			UserName:     &v.UserName,
 		})
 	}
 	return dto, nil

@@ -14,30 +14,51 @@ type WorkData struct {
 	WorkType     string
 }
 
-// func NewWorkData(id *int,
-// 	create_data_js *string,
-// 	detail *string,
-// 	experience *string,
-// 	isShow *bool,
-// 	name *string,
-// 	salary *int,
-// 	term *string,
-// 	Type *string,
-// 	workDays *string,
-// 	workType *string) WorkData {
-// 	return WorkData{
-// 		Name:         *name,
-// 		Salary:       *salary,
-// 		CreateDataJS: *create_data_js,
-// 		Detail:       *detail,
-// 		Experience:   *experience,
-// 		IsShow:       *isShow,
-// 		Term:         *term,
-// 		Type:         *Type,
-// 		WorkDays:     *workDays,
-// 		WorkType:     *workType,
-// 	}
-// }
+func NewWorkData(
+	create_data_js *string,
+	detail *string,
+	experience *string,
+	isShow *bool,
+	name *string,
+	salary *int,
+	term *string,
+	Type *string,
+	workDays *string,
+	workType *string) WorkData {
+	return WorkData{
+		Name:         convertNilString(name),
+		Salary:       convertNilInt(salary),
+		CreateDataJS: convertNilString(create_data_js),
+		Detail:       convertNilString(detail),
+		Experience:   convertNilString(experience),
+		IsShow:       convertNilBoolean(isShow),
+		Term:         convertNilString(term),
+		Type:         convertNilString(Type),
+		WorkDays:     convertNilString(workDays),
+		WorkType:     convertNilString(workType),
+	}
+}
+
+func convertNilString(str *string) string {
+	if str == nil {
+		return ""
+	}
+	return *str
+}
+
+func convertNilBoolean(b *bool) bool {
+	if b == nil {
+		return false
+	}
+	return true
+}
+
+func convertNilInt(i *int) int {
+	if i == nil {
+		return 0
+	}
+	return *i
+}
 
 type WorkDataRepository interface {
 	Insert(salary WorkData) (id int, err error)

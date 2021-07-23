@@ -15,8 +15,22 @@ type WorkData {
   workType: String
 }
 
+type Review {
+  id: ID!
+  company_name: String
+  detail: String
+  content: String
+  create_data_js: String
+  link: String
+  reasons: String
+  report: String
+  skill: String
+  user_name: String
+}
+
 type Query {
-  workdata: [WorkData!]!
+  workdata: [WorkData!]
+  review: [Review!]
 }
 
 input NewWorkData {
