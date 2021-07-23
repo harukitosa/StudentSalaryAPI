@@ -1,0 +1,37 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+type WorkData {
+  id: ID!
+  create_data_js: String
+  detail: String
+  experience: String
+  is_show: Boolean
+  name: String!
+  salary: Int!
+  term: String
+  type: String
+  workdays: String
+  workType: String
+}
+
+type Query {
+  workdata: [WorkData!]!
+}
+
+input NewWorkData {
+  create_data_js: String
+  detail: String
+  experience: String
+  is_show: Boolean
+  name: String
+  salary: Int!
+  term: String
+  type: String
+  workdays: String
+  workType: String
+}
+
+type Mutation {
+  createWorkData(input: NewWorkData!): WorkData!
+}

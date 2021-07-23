@@ -6,13 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"studentSalaryAPI/handler"
+	"studentSalaryAPI/graph"
+	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/infra"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	echo "github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -54,29 +55,20 @@ func initLocalDB() (*sqlx.DB, error) {
 	return db, nil
 }
 
+const defaultPort = "8080"
+
 func main() {
-	e := echo.New()
-
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	// localhostの方は消す
-
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
+	}
 	v := os.Getenv("RUNENV")
-
 	var db *sqlx.DB
 	var err error
 	if v == "production" {
 		db, err = initDB()
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: []string{"https://student-salary.com"},
-			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
-		}))
 	} else {
 		db, err = initLocalDB()
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: []string{"http://localhost:3000"},
-			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
-		}))
 	}
 
 	if err != nil {
@@ -85,37 +77,61 @@ func main() {
 
 	review := infra.NewReviewInfra(db)
 	workdata := infra.NewWorkDataInfra(db)
-	reviewHandler := handler.NewReviewHandler(review)
-	workdataHandler := handler.NewWorkDataHandler(workdata)
 
-	e.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
-	})
+	srv := handler.NewDefaultServer(
+		generated.NewExecutableSchema(
+			generated.Config{Resolvers: &graph.Resolver{
+				Review:   review,
+				Workdata: workdata,
+			}}))
 
-	// // JobSalary
-	e.GET("/jobSalary", workdataHandler.GetReview)
-	e.GET("/jobSalary/statistics", workdataHandler.GetAggregateWorkData)
-	e.POST("/jobSalary", workdataHandler.CreateWorkData)
-	// e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
-
-	// Review
-	e.GET("/review", reviewHandler.GetReview)
-	e.GET("/review/:id", reviewHandler.GetReviewByID)
-	e.POST("/review", reviewHandler.CreateReview)
-	e.GET("/review/created", reviewHandler.GetReviewByCreated)
-	// e.POST("/reviews", reviewAPI.ExportReview)
-
-	// // JobSalaryMap
-	// e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
-	// e.GET("/jobSalaryMap/count", jobSalaryMapAPI.GetJobSalaryMapByCount)
-
-	// e.GET("/jobSalaryMapData", jobSalaryAPI.GetJobsSalaryMap)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
-	log.Printf("Listening on port %s", port)
-	e.Logger.Fatal(e.Start(":" + port))
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", srv)
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
+
+// e := echo.New()
+
+// e.Use(middleware.Logger())
+// e.Use(middleware.Recover())
+// localhostの方は消す
+
+// var db *sqlx.DB
+
+// if err != nil {
+// 	log.Fatal(err)
+// }
+
+// reviewHandler := handler.NewReviewHandler(review)
+// workdataHandler := handler.NewWorkDataHandler(workdata)
+
+// e.GET("/", func(c echo.Context) error {
+// 	return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
+// })
+
+// // // JobSalary
+// e.GET("/jobSalary", workdataHandler.GetReview)
+// e.GET("/jobSalary/statistics", workdataHandler.GetAggregateWorkData)
+// e.POST("/jobSalary", workdataHandler.CreateWorkData)
+// // e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
+
+// // Review
+// e.GET("/review", reviewHandler.GetReview)
+// e.GET("/review/:id", reviewHandler.GetReviewByID)
+// e.POST("/review", reviewHandler.CreateReview)
+// e.GET("/review/created", reviewHandler.GetReviewByCreated)
+// e.POST("/reviews", reviewAPI.ExportReview)
+
+// // JobSalaryMap
+// e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
+// e.GET("/jobSalaryMap/count", jobSalaryMapAPI.GetJobSalaryMapByCount)
+// e.GET("/jobSalaryMapData", jobSalaryAPI.GetJobsSalaryMap)
+
+// port := os.Getenv("PORT")
+// if port == "" {
+// 	port = "8080"
+// 	log.Printf("Defaulting to port %s", port)
+// }
+// log.Printf("Listening on port %s", port)
+// e.Logger.Fatal(e.Start(":" + port))
