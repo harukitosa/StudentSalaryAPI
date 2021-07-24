@@ -43,6 +43,37 @@ func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWo
 	return response, nil
 }
 
+func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewReview) (*model.Review, error) {
+	review := domain.NewReview(
+		&input.CompanyName,
+		input.Detail,
+		&input.Content,
+		input.CreateDataJs,
+		input.Link,
+		input.Reasons,
+		input.Report,
+		input.Skill,
+		input.UserName,
+	)
+	id, err := r.Resolver.Review.Insert(review)
+	if err != nil {
+		return nil, err
+	}
+	response := model.Review{
+		ID:           fmt.Sprint(id),
+		CompanyName:  &review.CompanyName,
+		Detail:       &review.Detail,
+		Content:      &review.Content,
+		CreateDataJs: &review.CreateDateJS,
+		Link:         &review.Link,
+		Reasons:      &review.Reasons,
+		Report:       &review.Report,
+		Skill:        &review.Skill,
+		UserName:     &review.UserName,
+	}
+	return &response, nil
+}
+
 func (r *queryResolver) Workdata(ctx context.Context) ([]*model.WorkData, error) {
 	workdata, err := r.Resolver.Workdata.SelectAll()
 	if err != nil {

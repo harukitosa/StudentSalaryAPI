@@ -2,6 +2,18 @@
 
 package model
 
+type NewReview struct {
+	CompanyName  string  `json:"company_name"`
+	Detail       *string `json:"detail"`
+	Content      string  `json:"content"`
+	CreateDataJs *string `json:"create_data_js"`
+	Link         *string `json:"link"`
+	Reasons      *string `json:"reasons"`
+	Report       *string `json:"report"`
+	Skill        *string `json:"skill"`
+	UserName     *string `json:"user_name"`
+}
+
 type NewWorkData struct {
 	CreateDataJs *string `json:"create_data_js"`
 	Detail       *string `json:"detail"`

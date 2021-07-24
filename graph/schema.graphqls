@@ -46,6 +46,19 @@ input NewWorkData {
   workType: String
 }
 
+input NewReview {
+  company_name: String!
+  detail: String
+  content: String!
+  create_data_js: String
+  link: String
+  reasons: String
+  report: String
+  skill: String
+  user_name: String 
+}
+
 type Mutation {
   createWorkData(input: NewWorkData!): WorkData!
+  createReview(input: NewReview!): Review!
 }
