@@ -110,7 +110,9 @@ func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
 }
 
 func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
-	rows, err := r.db.Queryx("SELECT * FROM reviews")
+	var rows *sqlx.Rows
+	var err error
+	rows, err = r.db.Queryx("SELECT * FROM reviews")
 	if err != nil {
 		return nil, err
 	}

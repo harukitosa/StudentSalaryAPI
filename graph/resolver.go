@@ -9,4 +9,5 @@ import "studentSalaryAPI/domain"
 type Resolver struct {
 	Review   domain.ReviewRepository
 	Workdata domain.WorkDataRepository
+	Company  domain.CompanyRepository
 }

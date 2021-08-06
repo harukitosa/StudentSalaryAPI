@@ -1,5 +1,8 @@
 package domain
 
+import "sort"
+
+// domain
 type WorkData struct {
 	ID           int
 	CreateDataJS string
@@ -12,6 +15,53 @@ type WorkData struct {
 	Type         string
 	WorkDays     string
 	WorkType     string
+}
+type WorkDataRepository interface {
+	Insert(salary WorkData) (id int, err error)
+	SelectByID(id int) (WorkData, error)
+	SelectByName(name string) ([]WorkData, error)
+	SelectAll() ([]WorkData, error)
+}
+
+type WorkDataService struct{}
+
+func (s *WorkDataService) GetSalaryAvg(list []WorkData) int {
+	if len(list) == 0 {
+		return 0
+	}
+	ans := 0
+	for _, v := range list {
+		ans += v.Salary
+	}
+	return ans / len(list)
+}
+
+func (s *WorkDataService) GetSalaryMid(list []WorkData) int {
+	if len(list) == 0 {
+		return 0
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i].Salary < list[j].Salary })
+	i := len(list) / 2
+	if len(list)%2 == 0 {
+		return (list[i].Salary + list[i-1].Salary) / 2
+	}
+	return list[i].Salary
+}
+
+// GetCountByCompanyName ユニークな会社名がいくつあるのか調べる
+func (s *WorkDataService) GetCountByCompanyName(list []WorkData) int {
+	if len(list) == 0 {
+		return 0
+	}
+	m := map[string]int{}
+	count := 0
+	for _, v := range list {
+		if m[v.Name] == 0 {
+			count++
+		}
+		m[v.Name] = 1
+	}
+	return count
 }
 
 func NewWorkData(
@@ -58,11 +108,4 @@ func convertNilInt(i *int) int {
 		return 0
 	}
 	return *i
-}
-
-type WorkDataRepository interface {
-	Insert(salary WorkData) (id int, err error)
-	SelectByID(id int) (WorkData, error)
-	SelectByName(name string) ([]WorkData, error)
-	SelectAll() ([]WorkData, error)
 }

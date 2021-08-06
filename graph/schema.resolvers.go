@@ -74,7 +74,7 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 	return &response, nil
 }
 
-func (r *queryResolver) Workdata(ctx context.Context) ([]*model.WorkData, error) {
+func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, error) {
 	workdata, err := r.Resolver.Workdata.SelectAll()
 	if err != nil {
 		return nil, err
@@ -95,7 +95,15 @@ func (r *queryResolver) Workdata(ctx context.Context) ([]*model.WorkData, error)
 			WorkType:     &v.WorkType,
 		})
 	}
-	return dto, nil
+
+	workdataService := domain.WorkDataService{}
+	return &model.WorkDataInfo{
+		Avarage:      workdataService.GetSalaryAvg(workdata),
+		Mid:          workdataService.GetSalaryMid(workdata),
+		Count:        len(workdata),
+		CompanyCount: workdataService.GetCountByCompanyName(workdata),
+		Workdata:     dto,
+	}, nil
 }
 
 func (r *queryResolver) Review(ctx context.Context) ([]*model.Review, error) {
@@ -116,6 +124,46 @@ func (r *queryResolver) Review(ctx context.Context) ([]*model.Review, error) {
 			Report:       &v.Report,
 			Skill:        &v.Skill,
 			UserName:     &v.UserName,
+		})
+	}
+	return dto, nil
+}
+
+func (r *queryResolver) Newreview(ctx context.Context) ([]*model.Review, error) {
+	reviews, err := r.Resolver.Review.GetNewReview()
+	if err != nil {
+		return nil, err
+	}
+	var dto []*model.Review
+	for _, v := range reviews {
+		dto = append(dto, &model.Review{
+			ID:           fmt.Sprint(v.ID),
+			CompanyName:  &v.CompanyName,
+			Detail:       &v.Detail,
+			Content:      &v.Content,
+			CreateDataJs: &v.CreateDateJS,
+			Link:         &v.Link,
+			Reasons:      &v.Reasons,
+			Report:       &v.Report,
+			Skill:        &v.Skill,
+			UserName:     &v.UserName,
+		})
+	}
+	return dto, nil
+}
+
+func (r *queryResolver) Topcompany(ctx context.Context) ([]*model.Company, error) {
+	company, err := r.Resolver.Company.SelectByTop()
+	if err != nil {
+		return nil, err
+	}
+	var dto []*model.Company
+	for _, v := range company {
+		dto = append(dto, &model.Company{
+			Name:  v.Name,
+			Count: v.Count,
+			Max:   v.Max,
+			Min:   v.Min,
 		})
 	}
 	return dto, nil

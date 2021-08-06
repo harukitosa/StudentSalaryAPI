@@ -1,6 +1,20 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+type Query {
+  workdatainfo: WorkDataInfo!
+  review: [Review!]
+  newreview: [Review!]
+  topcompany: [Company!]
+}
+
+type Company {
+  name: String!
+  max: Int!
+  min: Int! 
+  count: Int!
+}
+
 type WorkData {
   id: ID!
   create_data_js: String
@@ -28,10 +42,14 @@ type Review {
   user_name: String
 }
 
-type Query {
+type WorkDataInfo {
+  company_count: Int!
+  avarage: Int!
+  count: Int!
+  mid: Int!
   workdata: [WorkData!]
-  review: [Review!]
 }
+
 
 input NewWorkData {
   create_data_js: String

@@ -2,6 +2,13 @@
 
 package model
 
+type Company struct {
+	Name  string `json:"name"`
+	Max   int    `json:"max"`
+	Min   int    `json:"min"`
+	Count int    `json:"count"`
+}
+
 type NewReview struct {
 	CompanyName  string  `json:"company_name"`
 	Detail       *string `json:"detail"`
@@ -52,4 +59,12 @@ type WorkData struct {
 	Type         *string `json:"type"`
 	Workdays     *string `json:"workdays"`
 	WorkType     *string `json:"workType"`
+}
+
+type WorkDataInfo struct {
+	CompanyCount int         `json:"company_count"`
+	Avarage      int         `json:"avarage"`
+	Count        int         `json:"count"`
+	Mid          int         `json:"mid"`
+	Workdata     []*WorkData `json:"workdata"`
 }
