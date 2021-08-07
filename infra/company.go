@@ -42,3 +42,23 @@ func (r *companyInfra) SelectByTop() ([]domain.Company, error) {
 	}
 	return res, nil
 }
+
+func (r *companyInfra) SelectByName(name string) (*domain.Company, error) {
+	query := `select name, max(salary) as max, min(salary) as min, count(*) as count 
+			from job_salaries 
+			where name=:name 
+			group by name`
+	stmt, err := r.db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+	args := map[string]interface{}{
+		"name": name,
+	}
+	var c company
+	err = stmt.Get(&c, args)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.Company{Max: c.Max, Count: c.Count, Min: c.Min, Name: c.Name}, nil
+}

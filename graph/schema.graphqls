@@ -6,6 +6,7 @@ type Query {
   review: [Review!]
   newreview: [Review!]
   topcompany: [Company!]
+  company(name: String): Company!
 }
 
 type Company {
@@ -13,6 +14,7 @@ type Company {
   max: Int!
   min: Int! 
   count: Int!
+  workdata: [WorkData!]
 }
 
 type WorkData {

@@ -169,6 +169,34 @@ func (r *queryResolver) Topcompany(ctx context.Context) ([]*model.Company, error
 	return dto, nil
 }
 
+func (r *queryResolver) Company(ctx context.Context, name *string) (*model.Company, error) {
+	if name == nil {
+		return nil, fmt.Errorf("not neme")
+	}
+	company, err := r.Resolver.Company.SelectByName(*name)
+	if err != nil {
+		return nil, err
+	}
+	workdata, err := r.Resolver.Workdata.SelectByName(*name)
+	var dto []*model.WorkData
+	for _, v := range workdata {
+		dto = append(dto, &model.WorkData{
+			ID:           fmt.Sprint(v.ID),
+			Name:         v.Name,
+			Salary:       v.Salary,
+			CreateDataJs: &v.CreateDataJS,
+			Detail:       &v.Detail,
+			Experience:   &v.Experience,
+			IsShow:       &v.IsShow,
+			Term:         &v.Term,
+			Type:         &v.Type,
+			Workdays:     &v.WorkDays,
+			WorkType:     &v.WorkType,
+		})
+	}
+	return &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto}, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

@@ -3,10 +3,11 @@
 package model
 
 type Company struct {
-	Name  string `json:"name"`
-	Max   int    `json:"max"`
-	Min   int    `json:"min"`
-	Count int    `json:"count"`
+	Name     string      `json:"name"`
+	Max      int         `json:"max"`
+	Min      int         `json:"min"`
+	Count    int         `json:"count"`
+	Workdata []*WorkData `json:"workdata"`
 }
 
 type NewReview struct {
