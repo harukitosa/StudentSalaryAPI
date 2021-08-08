@@ -15,6 +15,7 @@ type Company {
   min: Int! 
   count: Int!
   workdata: [WorkData!]
+  review: [Review!]
 }
 
 type WorkData {

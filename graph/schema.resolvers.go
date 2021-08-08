@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/graph/model"
@@ -80,7 +81,9 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 		return nil, err
 	}
 	var dto []*model.WorkData
-	for _, v := range workdata {
+	for _, w := range workdata {
+		var v domain.WorkData
+		v = w
 		dto = append(dto, &model.WorkData{
 			ID:           fmt.Sprint(v.ID),
 			Name:         v.Name,
@@ -134,9 +137,14 @@ func (r *queryResolver) Newreview(ctx context.Context) ([]*model.Review, error) 
 	if err != nil {
 		return nil, err
 	}
+	log.Println("GET REVIEWS")
+	log.Println(reviews)
 	var dto []*model.Review
-	for _, v := range reviews {
-		dto = append(dto, &model.Review{
+	tmp := append([]domain.Review{}, reviews...)
+	for _, s := range tmp {
+		var v domain.Review
+		v = s
+		r := model.Review{
 			ID:           fmt.Sprint(v.ID),
 			CompanyName:  &v.CompanyName,
 			Detail:       &v.Detail,
@@ -147,8 +155,11 @@ func (r *queryResolver) Newreview(ctx context.Context) ([]*model.Review, error) 
 			Report:       &v.Report,
 			Skill:        &v.Skill,
 			UserName:     &v.UserName,
-		})
+		}
+		dto = append(dto, &r)
 	}
+	log.Println("DTO")
+	log.Println(dto)
 	return dto, nil
 }
 
@@ -177,6 +188,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) (*model.Compa
 	if err != nil {
 		return nil, err
 	}
+
 	workdata, err := r.Resolver.Workdata.SelectByName(*name)
 	var dto []*model.WorkData
 	for _, v := range workdata {
@@ -194,7 +206,27 @@ func (r *queryResolver) Company(ctx context.Context, name *string) (*model.Compa
 			WorkType:     &v.WorkType,
 		})
 	}
-	return &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto}, nil
+
+	review, err := r.Resolver.Review.SelectByName(*name)
+	if err != nil {
+		return nil, err
+	}
+	var reviews []*model.Review
+	for _, v := range review {
+		reviews = append(reviews, &model.Review{
+			ID:           fmt.Sprint(v.ID),
+			CompanyName:  &v.CompanyName,
+			Detail:       &v.Detail,
+			Content:      &v.Content,
+			CreateDataJs: &v.CreateDateJS,
+			Link:         &v.Link,
+			Reasons:      &v.Reasons,
+			Report:       &v.Report,
+			Skill:        &v.Skill,
+			UserName:     &v.UserName,
+		})
+	}
+	return &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto, Review: reviews}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

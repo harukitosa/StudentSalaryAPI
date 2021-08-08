@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"log"
 	"studentSalaryAPI/domain"
 	"time"
 
@@ -89,7 +90,7 @@ func (r *reviewInfra) SelectByID(id int) (domain.Review, error) {
 }
 
 func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
-	query := `SELECT * FROM reviews WHERE name=:name`
+	query := `SELECT * FROM reviews WHERE company_name=:name`
 	stmt, err := r.db.PrepareNamed(query)
 	if err != nil {
 		return nil, nil
@@ -136,7 +137,7 @@ func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
 
 func (r *reviewInfra) GetNewReview() ([]domain.Review, error) {
 	rows, err := r.db.Queryx(`
-		select * from reviews order by created_at DESC limit 3
+		select * from reviews order by created_at DESC limit 3;
 	`)
 	if err != nil {
 		return nil, err
@@ -151,6 +152,7 @@ func (r *reviewInfra) GetNewReview() ([]domain.Review, error) {
 		}
 		reviews = append(reviews, *review)
 	}
+	log.Println(reviews)
 
 	var reviewsList []domain.Review
 	for _, v := range reviews {

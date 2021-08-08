@@ -8,6 +8,7 @@ type Company struct {
 	Min      int         `json:"min"`
 	Count    int         `json:"count"`
 	Workdata []*WorkData `json:"workdata"`
+	Review   []*Review   `json:"review"`
 }
 
 type NewReview struct {

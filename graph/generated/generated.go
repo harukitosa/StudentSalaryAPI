@@ -48,6 +48,7 @@ type ComplexityRoot struct {
 		Max      func(childComplexity int) int
 		Min      func(childComplexity int) int
 		Name     func(childComplexity int) int
+		Review   func(childComplexity int) int
 		Workdata func(childComplexity int) int
 	}
 
@@ -154,6 +155,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Company.Name(childComplexity), true
+
+	case "Company.review":
+		if e.complexity.Company.Review == nil {
+			break
+		}
+
+		return e.complexity.Company.Review(childComplexity), true
 
 	case "Company.workdata":
 		if e.complexity.Company.Workdata == nil {
@@ -489,6 +497,7 @@ type Company {
   min: Int! 
   count: Int!
   workdata: [WorkData!]
+  review: [Review!]
 }
 
 type WorkData {
@@ -831,6 +840,38 @@ func (ec *executionContext) _Company_workdata(ctx context.Context, field graphql
 	res := resTmp.([]*model.WorkData)
 	fc.Result = res
 	return ec.marshalOWorkData2ᚕᚖstudentSalaryAPIᚋgraphᚋmodelᚐWorkDataᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Company_review(ctx context.Context, field graphql.CollectedField, obj *model.Company) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Company",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Review, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Review)
+	fc.Result = res
+	return ec.marshalOReview2ᚕᚖstudentSalaryAPIᚋgraphᚋmodelᚐReviewᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createWorkData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3321,6 +3362,8 @@ func (ec *executionContext) _Company(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "workdata":
 			out.Values[i] = ec._Company_workdata(ctx, field, obj)
+		case "review":
+			out.Values[i] = ec._Company_review(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
