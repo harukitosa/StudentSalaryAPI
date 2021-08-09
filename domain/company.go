@@ -11,4 +11,5 @@ type Company struct {
 type CompanyRepository interface {
 	SelectByTop() ([]Company, error)
 	SelectByName(name string) (*Company, error)
+	Select() ([]Company, error)
 }

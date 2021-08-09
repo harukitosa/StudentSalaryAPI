@@ -110,7 +110,7 @@ type QueryResolver interface {
 	Review(ctx context.Context) ([]*model.Review, error)
 	Newreview(ctx context.Context) ([]*model.Review, error)
 	Topcompany(ctx context.Context) ([]*model.Company, error)
-	Company(ctx context.Context, name *string) (*model.Company, error)
+	Company(ctx context.Context, name *string) ([]*model.Company, error)
 }
 
 type executableSchema struct {
@@ -488,7 +488,7 @@ type Query {
   review: [Review!]
   newreview: [Review!]
   topcompany: [Company!]
-  company(name: String): Company!
+  company(name: String): [Company!]
 }
 
 type Company {
@@ -1121,14 +1121,11 @@ func (ec *executionContext) _Query_company(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Company)
+	res := resTmp.([]*model.Company)
 	fc.Result = res
-	return ec.marshalNCompany2ᚖstudentSalaryAPIᚋgraphᚋmodelᚐCompany(ctx, field.Selections, res)
+	return ec.marshalOCompany2ᚕᚖstudentSalaryAPIᚋgraphᚋmodelᚐCompanyᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3482,9 +3479,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_company(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "__type":
@@ -3902,10 +3896,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNCompany2studentSalaryAPIᚋgraphᚋmodelᚐCompany(ctx context.Context, sel ast.SelectionSet, v model.Company) graphql.Marshaler {
-	return ec._Company(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCompany2ᚖstudentSalaryAPIᚋgraphᚋmodelᚐCompany(ctx context.Context, sel ast.SelectionSet, v *model.Company) graphql.Marshaler {

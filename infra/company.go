@@ -62,3 +62,26 @@ func (r *companyInfra) SelectByName(name string) (*domain.Company, error) {
 	}
 	return &domain.Company{Max: c.Max, Count: c.Count, Min: c.Min, Name: c.Name}, nil
 }
+
+func (r *companyInfra) Select() ([]domain.Company, error) {
+	query := `select name, max(salary) as max, min(salary) as min, count(*) as count from job_salaries group by name order by name`
+	rows, err := r.db.Queryx(query)
+	if err != nil {
+		return nil, err
+	}
+	var list []company
+	for rows.Next() {
+		c := new(company)
+		err := rows.StructScan(&c)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, *c)
+	}
+
+	var res []domain.Company
+	for _, v := range list {
+		res = append(res, domain.Company{Max: v.Max, Count: v.Count, Min: v.Min, Name: v.Name})
+	}
+	return res, nil
+}

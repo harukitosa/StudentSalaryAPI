@@ -180,53 +180,124 @@ func (r *queryResolver) Topcompany(ctx context.Context) ([]*model.Company, error
 	return dto, nil
 }
 
-func (r *queryResolver) Company(ctx context.Context, name *string) (*model.Company, error) {
+func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Company, error) {
 	if name == nil {
-		return nil, fmt.Errorf("not neme")
-	}
-	company, err := r.Resolver.Company.SelectByName(*name)
-	if err != nil {
-		return nil, err
-	}
+		company, err := r.Resolver.Company.Select()
+		if err != nil {
+			return nil, err
+		}
 
-	workdata, err := r.Resolver.Workdata.SelectByName(*name)
-	var dto []*model.WorkData
-	for _, v := range workdata {
-		dto = append(dto, &model.WorkData{
-			ID:           fmt.Sprint(v.ID),
-			Name:         v.Name,
-			Salary:       v.Salary,
-			CreateDataJs: &v.CreateDataJS,
-			Detail:       &v.Detail,
-			Experience:   &v.Experience,
-			IsShow:       &v.IsShow,
-			Term:         &v.Term,
-			Type:         &v.Type,
-			Workdays:     &v.WorkDays,
-			WorkType:     &v.WorkType,
-		})
-	}
+		workdata, err := r.Resolver.Workdata.SelectAll()
+		var workdatalist []*model.WorkData
+		for _, w := range workdata {
+			v := w
+			workdatalist = append(workdatalist, &model.WorkData{
+				ID:           fmt.Sprint(v.ID),
+				Name:         v.Name,
+				Salary:       v.Salary,
+				CreateDataJs: &v.CreateDataJS,
+				Detail:       &v.Detail,
+				Experience:   &v.Experience,
+				IsShow:       &v.IsShow,
+				Term:         &v.Term,
+				Type:         &v.Type,
+				Workdays:     &v.WorkDays,
+				WorkType:     &v.WorkType,
+			})
+		}
 
-	review, err := r.Resolver.Review.SelectByName(*name)
-	if err != nil {
-		return nil, err
+		review, err := r.Resolver.Review.SelectAll()
+		if err != nil {
+			return nil, err
+		}
+		var reviews []*model.Review
+		for _, re := range review {
+			v := re
+			reviews = append(reviews, &model.Review{
+				ID:           fmt.Sprint(v.ID),
+				CompanyName:  &v.CompanyName,
+				Detail:       &v.Detail,
+				Content:      &v.Content,
+				CreateDataJs: &v.CreateDateJS,
+				Link:         &v.Link,
+				Reasons:      &v.Reasons,
+				Report:       &v.Report,
+				Skill:        &v.Skill,
+				UserName:     &v.UserName,
+			})
+		}
+		var list []*model.Company
+		for _, v := range company {
+			var workdata []*model.WorkData
+			var reviews []*model.Review
+			for _, w := range workdatalist {
+				if v.Name == w.Name {
+					workdata = append(workdata, w)
+				}
+			}
+			for _, r := range reviews {
+				if v.Name == *r.CompanyName {
+					reviews = append(reviews, r)
+				}
+			}
+			list = append(list, &model.Company{
+				Name:     v.Name,
+				Count:    v.Count,
+				Max:      v.Max,
+				Min:      v.Min,
+				Workdata: workdata,
+				Review:   reviews,
+			})
+		}
+		return list, nil
+	} else {
+		company, err := r.Resolver.Company.SelectByName(*name)
+		if err != nil {
+			return nil, err
+		}
+		workdata, err := r.Resolver.Workdata.SelectByName(*name)
+		var dto []*model.WorkData
+		for _, w := range workdata {
+			v := w
+			dto = append(dto, &model.WorkData{
+				ID:           fmt.Sprint(v.ID),
+				Name:         v.Name,
+				Salary:       v.Salary,
+				CreateDataJs: &v.CreateDataJS,
+				Detail:       &v.Detail,
+				Experience:   &v.Experience,
+				IsShow:       &v.IsShow,
+				Term:         &v.Term,
+				Type:         &v.Type,
+				Workdays:     &v.WorkDays,
+				WorkType:     &v.WorkType,
+			})
+		}
+
+		review, err := r.Resolver.Review.SelectByName(*name)
+		if err != nil {
+			return nil, err
+		}
+		var reviews []*model.Review
+		for _, re := range review {
+			v := re
+			reviews = append(reviews, &model.Review{
+				ID:           fmt.Sprint(v.ID),
+				CompanyName:  &v.CompanyName,
+				Detail:       &v.Detail,
+				Content:      &v.Content,
+				CreateDataJs: &v.CreateDateJS,
+				Link:         &v.Link,
+				Reasons:      &v.Reasons,
+				Report:       &v.Report,
+				Skill:        &v.Skill,
+				UserName:     &v.UserName,
+			})
+		}
+		var list []*model.Company
+		list = append(list, &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto, Review: reviews})
+		return list, nil
 	}
-	var reviews []*model.Review
-	for _, v := range review {
-		reviews = append(reviews, &model.Review{
-			ID:           fmt.Sprint(v.ID),
-			CompanyName:  &v.CompanyName,
-			Detail:       &v.Detail,
-			Content:      &v.Content,
-			CreateDataJs: &v.CreateDateJS,
-			Link:         &v.Link,
-			Reasons:      &v.Reasons,
-			Report:       &v.Report,
-			Skill:        &v.Skill,
-			UserName:     &v.UserName,
-		})
-	}
-	return &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto, Review: reviews}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

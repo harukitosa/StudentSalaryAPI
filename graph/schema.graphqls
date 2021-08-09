@@ -6,7 +6,7 @@ type Query {
   review: [Review!]
   newreview: [Review!]
   topcompany: [Company!]
-  company(name: String): Company!
+  company(name: String): [Company!]
 }
 
 type Company {
