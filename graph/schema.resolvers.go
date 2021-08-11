@@ -6,14 +6,14 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/graph/model"
 )
 
 func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWorkData) (*model.WorkData, error) {
-	workdata := domain.NewWorkData(
+	workdata, err := domain.NewWorkData(
+		nil,
 		input.CreateDataJs,
 		input.Detail,
 		input.Experience,
@@ -24,7 +24,10 @@ func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWo
 		input.Type,
 		input.Workdays,
 		input.WorkType)
-	id, err := r.Resolver.Workdata.Insert(workdata)
+	if err != nil {
+		return nil, err
+	}
+	id, err := r.Resolver.Workdata.Insert(*workdata)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +90,7 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 		dto = append(dto, &model.WorkData{
 			ID:           fmt.Sprint(v.ID),
 			Name:         v.Name,
-			Salary:       v.Salary,
+			Salary:       v.GetSalary().Int(),
 			CreateDataJs: &v.CreateDataJS,
 			Detail:       &v.Detail,
 			Experience:   &v.Experience,
@@ -137,8 +140,6 @@ func (r *queryResolver) Newreview(ctx context.Context) ([]*model.Review, error) 
 	if err != nil {
 		return nil, err
 	}
-	log.Println("GET REVIEWS")
-	log.Println(reviews)
 	var dto []*model.Review
 	tmp := append([]domain.Review{}, reviews...)
 	for _, s := range tmp {
@@ -158,8 +159,6 @@ func (r *queryResolver) Newreview(ctx context.Context) ([]*model.Review, error) 
 		}
 		dto = append(dto, &r)
 	}
-	log.Println("DTO")
-	log.Println(dto)
 	return dto, nil
 }
 
@@ -194,7 +193,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 			workdatalist = append(workdatalist, &model.WorkData{
 				ID:           fmt.Sprint(v.ID),
 				Name:         v.Name,
-				Salary:       v.Salary,
+				Salary:       v.GetSalary().Int(),
 				CreateDataJs: &v.CreateDataJS,
 				Detail:       &v.Detail,
 				Experience:   &v.Experience,
@@ -262,7 +261,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 			dto = append(dto, &model.WorkData{
 				ID:           fmt.Sprint(v.ID),
 				Name:         v.Name,
-				Salary:       v.Salary,
+				Salary:       v.GetSalary().Int(),
 				CreateDataJs: &v.CreateDataJS,
 				Detail:       &v.Detail,
 				Experience:   &v.Experience,

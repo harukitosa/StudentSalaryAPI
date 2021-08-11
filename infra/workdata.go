@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"log"
 	"studentSalaryAPI/domain"
 	"time"
 
@@ -33,19 +34,23 @@ type workdata struct {
 }
 
 func (w *workdata) toDomain() domain.WorkData {
-	return domain.WorkData{
-		ID:           w.ID,
-		Detail:       w.Detail,
-		CreateDataJS: w.CreateDataJS,
-		Experience:   w.Experience,
-		IsShow:       w.IsShow,
-		Name:         w.Name,
-		Salary:       w.Salary,
-		Term:         w.Term,
-		Type:         w.Type,
-		WorkDays:     w.WorkDays,
-		WorkType:     w.WorkType,
+	info, err := domain.NewWorkData(
+		&w.ID,
+		&w.CreateDataJS,
+		&w.Detail,
+		&w.Experience,
+		&w.IsShow,
+		&w.Name,
+		&w.Salary,
+		&w.Term,
+		&w.Type,
+		&w.WorkDays,
+		&w.WorkType,
+	)
+	if err != nil {
+		log.Println("fail convert to domain")
 	}
+	return *info
 }
 
 func (r *workdataInfra) Insert(review domain.WorkData) (id int, err error) {
@@ -61,7 +66,7 @@ func (r *workdataInfra) Insert(review domain.WorkData) (id int, err error) {
 			"experience":     review.Experience,
 			"is_show":        review.IsShow,
 			"name":           review.Name,
-			"salary":         review.Salary,
+			"salary":         review.GetSalary().Int(),
 			"term":           review.Term,
 			"type":           review.Type,
 			"work_days":      review.WorkDays,
