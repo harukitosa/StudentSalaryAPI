@@ -7,17 +7,17 @@ import (
 
 // domain
 type WorkData struct {
-	ID           int
-	CreateDataJS string
-	Detail       string
-	Experience   string
-	IsShow       bool
-	Name         string
-	salary       salary
-	Term         string
-	Type         string
-	WorkDays     string
-	WorkType     string
+	ID                int
+	CreateDataJS      string
+	Detail            string
+	Experience        string
+	IsShow            bool
+	Name              string
+	salary            salary
+	Term              string
+	engineeringDomain engineeringDomain
+	WorkDays          string
+	contractType      contractType
 }
 type WorkDataRepository interface {
 	Insert(salary WorkData) (id int, err error)
@@ -28,6 +28,43 @@ type WorkDataRepository interface {
 
 func (w *WorkData) GetSalary() *salary {
 	return &w.salary
+}
+
+func (w *WorkData) GetContractType() *contractType {
+	return &w.contractType
+}
+
+func (w *WorkData) GetEnginneringDomain() *engineeringDomain {
+	return &w.engineeringDomain
+}
+
+//  VO: 契約種別
+type contractType string
+
+const (
+	INTERN      = "インターン"
+	OUTSOURCING = "業務委託"
+	PARTTIME    = "アルバイト"
+	NONE        = "なし"
+)
+
+func isContentType(value string) bool {
+	return value == INTERN || value == OUTSOURCING || value == PARTTIME || value == NONE
+}
+
+func newcontractType(value *string) (contractType, error) {
+	if value == nil || *value == "" {
+		return contractType(NONE), nil
+	}
+	s := *value
+	if isContentType(s) {
+		return contractType(s), nil
+	}
+	return contractType(NONE), fmt.Errorf("対応する契約種別がありません")
+}
+
+func (c *contractType) String() string {
+	return string(*c)
 }
 
 // VO: 給料
@@ -54,6 +91,48 @@ func (s *salary) isBiggerThan(c *salary) bool {
 
 func (s *salary) Int() int {
 	return int(*s)
+}
+
+// VO: エンジニアリング領域
+type engineeringDomain string
+
+const (
+	IOS         = "IOS"
+	ANDROID     = "Android"
+	MOBILE      = "Mobile"
+	WEBFRONTEND = "Web Frontend"
+	FULLSTACK   = "FULLSTACK"
+	BACKEND     = "Backend"
+	AIML        = "AL/ML"
+	INFRA       = "Infra"
+	SRE         = "Site Reliability(SRE)"
+	SECURITY    = "Security"
+	DEVOPS      = "Devops"
+	DATA        = "Data"
+	NETWORKING  = "Networking"
+	OTHERS      = "その他"
+)
+
+func isEngineeringDomain(v string) bool {
+	return v == IOS || v == ANDROID || v == MOBILE || v == WEBFRONTEND || v == FULLSTACK || v == BACKEND || v == AIML || v == INFRA || v == SRE || v == SECURITY || v == DEVOPS || v == DATA || v == NETWORKING || v == OTHERS
+}
+
+func newengineeringDomain(value *string) (engineeringDomain, error) {
+	if value == nil || *value == "" {
+		return engineeringDomain(OTHERS), nil
+	}
+	if isEngineeringDomain(*value) {
+		return engineeringDomain(*value), nil
+	}
+	return engineeringDomain(OTHERS), fmt.Errorf("対応するエンジニアリング領域がありません")
+}
+
+func (e *engineeringDomain) getValue() *engineeringDomain {
+	return e
+}
+
+func (e *engineeringDomain) String() string {
+	return string(*e)
 }
 
 type WorkDataService struct{}
@@ -117,18 +196,26 @@ func NewWorkData(
 	if err != nil {
 		return nil, err
 	}
+	contractType, err := newcontractType(workType)
+	if err != nil {
+		return nil, err
+	}
+	engineeringDomain, err := newengineeringDomain(Type)
+	if err != nil {
+		return nil, err
+	}
 	w := WorkData{
-		ID:           *id,
-		Name:         convertNilString(name),
-		salary:       *salary,
-		CreateDataJS: convertNilString(create_data_js),
-		Detail:       convertNilString(detail),
-		Experience:   convertNilString(experience),
-		IsShow:       convertNilBoolean(isShow),
-		Term:         convertNilString(term),
-		Type:         convertNilString(Type),
-		WorkDays:     convertNilString(workDays),
-		WorkType:     convertNilString(workType),
+		ID:                *id,
+		Name:              convertNilString(name),
+		salary:            *salary,
+		CreateDataJS:      convertNilString(create_data_js),
+		Detail:            convertNilString(detail),
+		Experience:        convertNilString(experience),
+		IsShow:            convertNilBoolean(isShow),
+		Term:              convertNilString(term),
+		engineeringDomain: engineeringDomain,
+		WorkDays:          convertNilString(workDays),
+		contractType:      contractType,
 	}
 	return &w, nil
 }

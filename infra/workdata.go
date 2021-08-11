@@ -48,7 +48,8 @@ func (w *workdata) toDomain() domain.WorkData {
 		&w.WorkType,
 	)
 	if err != nil {
-		log.Println("fail convert to domain")
+		log.Println("faild to convert domain")
+		log.Println(err)
 	}
 	return *info
 }
@@ -68,9 +69,9 @@ func (r *workdataInfra) Insert(review domain.WorkData) (id int, err error) {
 			"name":           review.Name,
 			"salary":         review.GetSalary().Int(),
 			"term":           review.Term,
-			"type":           review.Type,
+			"type":           review.engineeringDomain,
 			"work_days":      review.WorkDays,
-			"work_type":      review.WorkType,
+			"work_type":      review.GetContractType().String(),
 		})
 	if err != nil {
 		return 0, err

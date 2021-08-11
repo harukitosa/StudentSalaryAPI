@@ -87,6 +87,8 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 	for _, w := range workdata {
 		var v domain.WorkData
 		v = w
+		contractType := v.GetContractType().String()
+		engineringDomain := v.GetEnginneringDomain().String()
 		dto = append(dto, &model.WorkData{
 			ID:           fmt.Sprint(v.ID),
 			Name:         v.Name,
@@ -96,9 +98,9 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 			Experience:   &v.Experience,
 			IsShow:       &v.IsShow,
 			Term:         &v.Term,
-			Type:         &v.Type,
+			Type:         &engineringDomain,
 			Workdays:     &v.WorkDays,
-			WorkType:     &v.WorkType,
+			WorkType:     &contractType,
 		})
 	}
 
@@ -190,6 +192,8 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		var workdatalist []*model.WorkData
 		for _, w := range workdata {
 			v := w
+			contractType := v.GetContractType().String()
+			engineeringDomain := v.GetEnginneringDomain().String()
 			workdatalist = append(workdatalist, &model.WorkData{
 				ID:           fmt.Sprint(v.ID),
 				Name:         v.Name,
@@ -199,9 +203,9 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 				Experience:   &v.Experience,
 				IsShow:       &v.IsShow,
 				Term:         &v.Term,
-				Type:         &v.Type,
+				Type:         &engineeringDomain,
 				Workdays:     &v.WorkDays,
-				WorkType:     &v.WorkType,
+				WorkType:     &contractType,
 			})
 		}
 
@@ -258,6 +262,8 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		var dto []*model.WorkData
 		for _, w := range workdata {
 			v := w
+			contractType := v.GetContractType().String()
+			engineeringDomain := v.GetEnginneringDomain().String()
 			dto = append(dto, &model.WorkData{
 				ID:           fmt.Sprint(v.ID),
 				Name:         v.Name,
@@ -267,9 +273,9 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 				Experience:   &v.Experience,
 				IsShow:       &v.IsShow,
 				Term:         &v.Term,
-				Type:         &v.Type,
+				Type:         &engineeringDomain,
 				Workdays:     &v.WorkDays,
-				WorkType:     &v.WorkType,
+				WorkType:     &contractType,
 			})
 		}
 
