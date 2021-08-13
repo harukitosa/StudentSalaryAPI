@@ -5,25 +5,54 @@ import (
 	"sort"
 )
 
-// domain
+// entity
 type WorkData struct {
-	ID                int
-	CreateDataJS      string
-	Detail            string
-	Experience        string
-	IsShow            bool
-	Name              string
+	id                workdataID
+	createDate        createDate
+	detail            workdetail
+	experience        experience
+	isShow            approval
+	name              companyName
 	salary            salary
-	Term              string
+	term              workterm
 	engineeringDomain engineeringDomain
-	WorkDays          string
+	workdays          workdays
 	contractType      contractType
 }
+
 type WorkDataRepository interface {
 	Insert(salary WorkData) (id int, err error)
 	SelectByID(id int) (WorkData, error)
 	SelectByName(name string) ([]WorkData, error)
 	SelectAll() ([]WorkData, error)
+}
+
+func (w *WorkData) GetID() *workdataID {
+	return &w.id
+}
+
+func (w *WorkData) GetApprove() *approval {
+	return &w.isShow
+}
+
+func (w *WorkData) GetCreateDate() *createDate {
+	return &w.createDate
+}
+
+func (w *WorkData) GetExperience() *experience {
+	return &w.experience
+}
+
+func (w *WorkData) GetTerm() *workterm {
+	return &w.term
+}
+
+func (w *WorkData) GetWorkDetail() *workdetail {
+	return &w.detail
+}
+
+func (w *WorkData) GetCompanyName() *companyName {
+	return &w.name
 }
 
 func (w *WorkData) GetSalary() *salary {
@@ -38,29 +67,160 @@ func (w *WorkData) GetEnginneringDomain() *engineeringDomain {
 	return &w.engineeringDomain
 }
 
+func (w *WorkData) GetWorkDays() *workdays {
+	return &w.workdays
+}
+
+// ENTITY: WorkDataID
+type workdataID int
+
+func newworkdataID(value *int) (workdataID, error) {
+	if value == nil {
+		return workdataID(0), fmt.Errorf("idの値がnilです")
+	}
+	return workdataID(*value), nil
+}
+
+func (w *workdataID) Int() int {
+	return int(*w)
+}
+
+// VO: 投稿日時
+// 色々あってJSのdateが入っていたりいなかったり
+type createDate string
+
+func newcreateDate(value *string) createDate {
+	if value == nil {
+		return createDate("")
+	}
+	return createDate(*value)
+}
+
+func (c *createDate) String() string {
+	return string(*c)
+}
+
+// VO: 経験年数
+// サボってます
+type experience string
+
+func newexperience(value *string) experience {
+	if value == nil || *value == "" {
+		return experience("未記入")
+	}
+	str := *value
+	return experience(str)
+}
+
+func (e *experience) String() string {
+	return string(*e)
+}
+
+// VO: 承認済み
+type approval bool
+
+func newapproval(value *bool) approval {
+	if value == nil {
+		return approval(false)
+	}
+	return approval(*value)
+}
+
+func (a *approval) approve() {
+	approve := approval(true)
+	a = &approve
+}
+
+func (a *approval) Bool() bool {
+	return bool(*a)
+}
+
+// VO: 勤務期間
+type workterm string
+
+const (
+	oneday            = "1day"
+	twodays           = "2days"
+	week              = "1week"
+	twoweeks          = "2weeks"
+	threeweeks        = "3weeks"
+	month             = "1month"
+	twoorthreemonth   = "2~3month"
+	halfyear          = "6months"
+	year              = "1year"
+	twoorthreeyear    = "2~3year"
+	morethanthreeyear = "More than 3 years"
+)
+
+func isworkterm(value string) bool {
+	return value == oneday || value == twodays || value == week || value == twoweeks || value == threeweeks || value == month || value == twoorthreemonth || value == halfyear || value == year || value == twoorthreeyear || value == morethanthreeyear
+}
+
+func newworkterm(value *string) (*workterm, error) {
+	if isworkterm(*value) {
+		term := workterm(*value)
+		return &term, nil
+	}
+	str := workterm("未記入")
+	return &str, nil
+}
+
+func (w *workterm) String() string {
+	return string(*w)
+}
+
+// VO: 詳細内容
+type workdetail string
+
+func newworkdetail(value *string) workdetail {
+	if value == nil || *value == "" {
+		return workdetail("なし")
+	}
+	return workdetail(*value)
+}
+
+func (c *workdetail) String() string {
+	return string(*c)
+}
+
+// VO: 企業名
+type companyName string
+
+func newcompanyName(value *string) (companyName, error) {
+	if value == nil || *value == "" {
+		return companyName(""), fmt.Errorf("企業名が空です")
+	}
+	s := *value
+	return companyName(s), nil
+}
+
+func (c *companyName) String() string {
+	return string(*c)
+}
+
 //  VO: 契約種別
 type contractType string
 
 const (
-	INTERN      = "インターン"
-	OUTSOURCING = "業務委託"
-	PARTTIME    = "アルバイト"
-	NONE        = "なし"
+	intern      = "インターン"
+	outsourcing = "業務委託"
+	parttime    = "アルバイト"
+	none        = "なし"
 )
 
 func isContentType(value string) bool {
-	return value == INTERN || value == OUTSOURCING || value == PARTTIME || value == NONE
+	return value == intern || value == outsourcing || value == parttime || value == none
 }
 
 func newcontractType(value *string) (contractType, error) {
 	if value == nil || *value == "" {
-		return contractType(NONE), nil
+		return contractType(none), nil
 	}
 	s := *value
 	if isContentType(s) {
 		return contractType(s), nil
 	}
-	return contractType(NONE), fmt.Errorf("対応する契約種別がありません")
+	return contractType(none), fmt.Errorf("対応する契約種別がありません")
 }
 
 func (c *contractType) String() string {
@@ -72,10 +232,13 @@ type salary int
 
 func newsalary(value *int) (*salary, error) {
 	if value == nil {
-		return nil, fmt.Errorf("給料の値がnullです")
+		return nil, fmt.Errorf("給料の値がnilです")
 	}
 	if *value < 0 {
 		return nil, fmt.Errorf("給料の値が負の数です")
+	}
+	if *value >= 100000 {
+		return nil, fmt.Errorf("給料の値が想定より高いです")
 	}
 	n := salary(*value)
 	return &n, nil
@@ -97,34 +260,35 @@ func (s *salary) Int() int {
 type engineeringDomain string
 
 const (
-	IOS         = "IOS"
-	ANDROID     = "Android"
-	MOBILE      = "Mobile"
-	WEBFRONTEND = "Web Frontend"
-	FULLSTACK   = "FULLSTACK"
-	BACKEND     = "Backend"
-	AIML        = "AL/ML"
-	INFRA       = "Infra"
-	SRE         = "Site Reliability(SRE)"
-	SECURITY    = "Security"
-	DEVOPS      = "Devops"
-	DATA        = "Data"
-	NETWORKING  = "Networking"
-	OTHERS      = "その他"
+	ios         = "iOS"
+	android     = "Android"
+	mobile      = "Mobile"
+	webfrontend = "Web Frontend"
+	fullstack   = "Fullstack"
+	backend     = "Backend"
+	aiml        = "AI/ML"
+	infra       = "Infra"
+	sre         = "Site Reliability(SRE)"
+	security    = "Security"
+	devops      = "Devops"
+	data        = "Data"
+	networking  = "Networking"
+	others      = "その他"
+	nonedomain  = "記載なし"
 )
 
 func isEngineeringDomain(v string) bool {
-	return v == IOS || v == ANDROID || v == MOBILE || v == WEBFRONTEND || v == FULLSTACK || v == BACKEND || v == AIML || v == INFRA || v == SRE || v == SECURITY || v == DEVOPS || v == DATA || v == NETWORKING || v == OTHERS
+	return v == ios || v == android || v == mobile || v == webfrontend || v == fullstack || v == backend || v == aiml || v == infra || v == sre || v == security || v == devops || v == data || v == networking || v == others || v == nonedomain
 }
 
 func newengineeringDomain(value *string) (engineeringDomain, error) {
 	if value == nil || *value == "" {
-		return engineeringDomain(OTHERS), nil
+		return engineeringDomain(nonedomain), nil
 	}
 	if isEngineeringDomain(*value) {
 		return engineeringDomain(*value), nil
 	}
-	return engineeringDomain(OTHERS), fmt.Errorf("対応するエンジニアリング領域がありません")
+	return engineeringDomain(nonedomain), fmt.Errorf("対応するエンジニアリング領域がありません")
 }
 
 func (e *engineeringDomain) getValue() *engineeringDomain {
@@ -133,6 +297,41 @@ func (e *engineeringDomain) getValue() *engineeringDomain {
 
 func (e *engineeringDomain) String() string {
 	return string(*e)
+}
+
+// VO: 週出勤日数
+// intの方がbetterだよね
+type workdays string
+
+const (
+	one          = "1"
+	two          = "2"
+	three        = "3"
+	four         = "4"
+	five         = "5"
+	noneworkdays = "記載なし"
+)
+
+func newworkdays(value *string) (workdays, error) {
+	if value == nil || *value == "" {
+		return workdays(noneworkdays), nil
+	}
+	if isWorkdays(*value) {
+		return workdays(*value), nil
+	}
+	return workdays(noneworkdays), fmt.Errorf("対応する週出勤日数がありません")
+}
+
+func isWorkdays(v string) bool {
+	return v == one || v == two || v == three || v == four || v == five || v == noneworkdays
+}
+
+func (w *workdays) getValue() *workdays {
+	return w
+}
+
+func (w *workdays) String() string {
+	return string(*w)
 }
 
 type WorkDataService struct{}
@@ -171,10 +370,10 @@ func (s *WorkDataService) GetCountByCompanyName(list []WorkData) int {
 	m := map[string]int{}
 	count := 0
 	for _, v := range list {
-		if m[v.Name] == 0 {
+		if m[v.GetCompanyName().String()] == 0 {
 			count++
 		}
-		m[v.Name] = 1
+		m[v.GetCompanyName().String()] = 1
 	}
 	return count
 }
@@ -192,6 +391,7 @@ func NewWorkData(
 	Type *string,
 	workDays *string,
 	workType *string) (*WorkData, error) {
+
 	salary, err := newsalary(s)
 	if err != nil {
 		return nil, err
@@ -204,17 +404,38 @@ func NewWorkData(
 	if err != nil {
 		return nil, err
 	}
+	workdays, err := newworkdays(workDays)
+	if err != nil {
+		return nil, err
+	}
+	companyName, err := newcompanyName(name)
+	if err != nil {
+		return nil, err
+	}
+	workdetail := newworkdetail(detail)
+
+	workdataID, err := newworkdataID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	e := newexperience(experience)
+	wterm, err := newworkterm(term)
+	if err != nil {
+		return nil, err
+	}
+
 	w := WorkData{
-		ID:                *id,
-		Name:              convertNilString(name),
+		id:                workdataID,
+		name:              companyName,
 		salary:            *salary,
-		CreateDataJS:      convertNilString(create_data_js),
-		Detail:            convertNilString(detail),
-		Experience:        convertNilString(experience),
-		IsShow:            convertNilBoolean(isShow),
-		Term:              convertNilString(term),
+		createDate:        createDate(*create_data_js),
+		detail:            workdetail,
+		experience:        e,
+		isShow:            newapproval(isShow),
+		term:              *wterm,
 		engineeringDomain: engineeringDomain,
-		WorkDays:          convertNilString(workDays),
+		workdays:          workdays,
 		contractType:      contractType,
 	}
 	return &w, nil

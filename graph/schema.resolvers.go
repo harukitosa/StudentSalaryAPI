@@ -78,6 +78,31 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 	return &response, nil
 }
 
+func convertGraphqlModel(w domain.WorkData) *model.WorkData {
+	v := w
+	contractType := v.GetContractType().String()
+	engineringDomain := v.GetEnginneringDomain().String()
+	workdays := v.GetWorkDays().String()
+	workdetail := v.GetWorkDetail().String()
+	createdate := v.GetCreateDate().String()
+	experice := v.GetExperience().String()
+	isShow := v.GetApprove().Bool()
+	term := v.GetTerm().String()
+	return &model.WorkData{
+		ID:           fmt.Sprint(v.GetID().Int()),
+		Name:         v.GetCompanyName().String(),
+		Salary:       v.GetSalary().Int(),
+		CreateDataJs: &createdate,
+		Detail:       &workdetail,
+		Experience:   &experice,
+		IsShow:       &isShow,
+		Term:         &term,
+		Type:         &engineringDomain,
+		Workdays:     &workdays,
+		WorkType:     &contractType,
+	}
+}
+
 func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, error) {
 	workdata, err := r.Resolver.Workdata.SelectAll()
 	if err != nil {
@@ -85,23 +110,7 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 	}
 	var dto []*model.WorkData
 	for _, w := range workdata {
-		var v domain.WorkData
-		v = w
-		contractType := v.GetContractType().String()
-		engineringDomain := v.GetEnginneringDomain().String()
-		dto = append(dto, &model.WorkData{
-			ID:           fmt.Sprint(v.ID),
-			Name:         v.Name,
-			Salary:       v.GetSalary().Int(),
-			CreateDataJs: &v.CreateDataJS,
-			Detail:       &v.Detail,
-			Experience:   &v.Experience,
-			IsShow:       &v.IsShow,
-			Term:         &v.Term,
-			Type:         &engineringDomain,
-			Workdays:     &v.WorkDays,
-			WorkType:     &contractType,
-		})
+		dto = append(dto, convertGraphqlModel(w))
 	}
 
 	workdataService := domain.WorkDataService{}
@@ -191,22 +200,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		workdata, err := r.Resolver.Workdata.SelectAll()
 		var workdatalist []*model.WorkData
 		for _, w := range workdata {
-			v := w
-			contractType := v.GetContractType().String()
-			engineeringDomain := v.GetEnginneringDomain().String()
-			workdatalist = append(workdatalist, &model.WorkData{
-				ID:           fmt.Sprint(v.ID),
-				Name:         v.Name,
-				Salary:       v.GetSalary().Int(),
-				CreateDataJs: &v.CreateDataJS,
-				Detail:       &v.Detail,
-				Experience:   &v.Experience,
-				IsShow:       &v.IsShow,
-				Term:         &v.Term,
-				Type:         &engineeringDomain,
-				Workdays:     &v.WorkDays,
-				WorkType:     &contractType,
-			})
+			workdatalist = append(workdatalist, convertGraphqlModel(w))
 		}
 
 		review, err := r.Resolver.Review.SelectAll()
@@ -261,22 +255,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		workdata, err := r.Resolver.Workdata.SelectByName(*name)
 		var dto []*model.WorkData
 		for _, w := range workdata {
-			v := w
-			contractType := v.GetContractType().String()
-			engineeringDomain := v.GetEnginneringDomain().String()
-			dto = append(dto, &model.WorkData{
-				ID:           fmt.Sprint(v.ID),
-				Name:         v.Name,
-				Salary:       v.GetSalary().Int(),
-				CreateDataJs: &v.CreateDataJS,
-				Detail:       &v.Detail,
-				Experience:   &v.Experience,
-				IsShow:       &v.IsShow,
-				Term:         &v.Term,
-				Type:         &engineeringDomain,
-				Workdays:     &v.WorkDays,
-				WorkType:     &contractType,
-			})
+			dto = append(dto, convertGraphqlModel(w))
 		}
 
 		review, err := r.Resolver.Review.SelectByName(*name)

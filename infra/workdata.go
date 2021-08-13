@@ -62,15 +62,15 @@ func (r *workdataInfra) Insert(review domain.WorkData) (id int, err error) {
 		map[string]interface{}{
 			"created_at":     time.Now(),
 			"updated_at":     time.Now(),
-			"create_data_js": review.CreateDataJS,
-			"detail":         review.Detail,
-			"experience":     review.Experience,
-			"is_show":        review.IsShow,
-			"name":           review.Name,
+			"create_data_js": review.GetCreateDate().String(),
+			"detail":         review.GetWorkDetail().String(),
+			"experience":     review.GetExperience().String(),
+			"is_show":        review.GetApprove(),
+			"name":           review.GetCompanyName().String(),
 			"salary":         review.GetSalary().Int(),
-			"term":           review.Term,
-			"type":           review.engineeringDomain,
-			"work_days":      review.WorkDays,
+			"term":           review.GetTerm().String(),
+			"type":           review.GetEnginneringDomain().String(),
+			"work_days":      review.GetWorkDays().String(),
 			"work_type":      review.GetContractType().String(),
 		})
 	if err != nil {
