@@ -1,5 +1,9 @@
 package domain
 
+import (
+	"fmt"
+)
+
 type Company struct {
 	Name     string
 	Max      int
@@ -12,4 +16,19 @@ type CompanyRepository interface {
 	SelectByTop() ([]Company, error)
 	SelectByName(name string) (*Company, error)
 	Select() ([]Company, error)
+}
+
+// VO: 企業名
+type companyName string
+
+func newcompanyName(value *string) (companyName, error) {
+	if value == nil || *value == "" {
+		return companyName(""), fmt.Errorf("企業名が空です")
+	}
+	s := *value
+	return companyName(s), nil
+}
+
+func (c companyName) String() string {
+	return string(c)
 }

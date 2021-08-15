@@ -85,21 +85,6 @@ func (w *workdataID) Int() int {
 	return int(*w)
 }
 
-// VO: 投稿日時
-// 色々あってJSのdateが入っていたりいなかったり
-type createDate string
-
-func newcreateDate(value *string) createDate {
-	if value == nil {
-		return createDate("")
-	}
-	return createDate(*value)
-}
-
-func (c *createDate) String() string {
-	return string(*c)
-}
-
 // VO: 経験年数
 // サボってます
 type experience string
@@ -167,35 +152,6 @@ func newworkterm(value *string) (*workterm, error) {
 
 func (w *workterm) String() string {
 	return string(*w)
-}
-
-// VO: 詳細内容
-type workdetail string
-
-func newworkdetail(value *string) workdetail {
-	if value == nil || *value == "" {
-		return workdetail("なし")
-	}
-	return workdetail(*value)
-}
-
-func (c *workdetail) String() string {
-	return string(*c)
-}
-
-// VO: 企業名
-type companyName string
-
-func newcompanyName(value *string) (companyName, error) {
-	if value == nil || *value == "" {
-		return companyName(""), fmt.Errorf("企業名が空です")
-	}
-	s := *value
-	return companyName(s), nil
-}
-
-func (c *companyName) String() string {
-	return string(*c)
 }
 
 //  VO: 契約種別
@@ -412,7 +368,7 @@ func NewWorkData(
 	if err != nil {
 		return nil, err
 	}
-	workdetail := newworkdetail(detail)
+	wd := newworkdetail(detail)
 
 	workdataID, err := newworkdataID(id)
 	if err != nil {
@@ -430,7 +386,7 @@ func NewWorkData(
 		name:              companyName,
 		salary:            *salary,
 		createDate:        createDate(*create_data_js),
-		detail:            workdetail,
+		detail:            wd,
 		experience:        e,
 		isShow:            newapproval(isShow),
 		term:              *wterm,

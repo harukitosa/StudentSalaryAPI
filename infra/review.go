@@ -31,18 +31,18 @@ type review struct {
 	UserName     string     `db:"user_name"`
 }
 
-func (r *review) toDomain() domain.Review {
-	return domain.Review{
-		ID:           r.ID,
-		CompanyName:  r.CompanyName,
-		Content:      r.Content,
-		CreateDateJS: r.CreateDateJS,
-		Link:         r.Link,
-		Reasons:      r.Reasons,
-		Report:       r.Report,
-		Skill:        r.Skill,
-		UserName:     r.UserName,
-	}
+func (r *review) toDomain() (domain.Review, error) {
+	return domain.NewReview(
+		&r.ID,
+		&r.CompanyName,
+		&r.Content,
+		&r.CreateDateJS,
+		&r.Link,
+		&r.Reasons,
+		&r.Report,
+		&r.Skill,
+		&r.UserName,
+	)
 }
 
 func (r *reviewInfra) Insert(review domain.Review) (id int, err error) {
@@ -51,14 +51,14 @@ func (r *reviewInfra) Insert(review domain.Review) (id int, err error) {
 	(company_name,content,create_date_js,link,reasons,report,skill,user_name) 
 	VALUES (:company_name,:content,:create_date_js,:link,:reasons,:report,:skill,:user_name)`,
 		map[string]interface{}{
-			"company_name":   review.CompanyName,
-			"content":        review.Content,
-			"create_date_js": review.CreateDateJS,
-			"link":           review.Link,
-			"reasons":        review.Reasons,
-			"report":         review.Report,
-			"skill":          review.Skill,
-			"user_name":      review.UserName,
+			"company_name":   review.GetCompanyName().String(),
+			"content":        review.GetContent().String(),
+			"create_date_js": review.GetCreateDate().String(),
+			"link":           review.GetLink().String(),
+			"reasons":        review.GetReasons().String(),
+			"report":         review.GetReport().String(),
+			"skill":          review.GetSkill().String(),
+			"user_name":      review.GetUserName().String(),
 		})
 	if err != nil {
 		return 0, err
@@ -86,7 +86,7 @@ func (r *reviewInfra) SelectByID(id int) (domain.Review, error) {
 	if err != nil {
 		return domain.Review{}, nil
 	}
-	return item.toDomain(), nil
+	return item.toDomain()
 }
 
 func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
@@ -105,7 +105,11 @@ func (r *reviewInfra) SelectByName(name string) ([]domain.Review, error) {
 	}
 	var reviewsList []domain.Review
 	for _, v := range items {
-		reviewsList = append(reviewsList, v.toDomain())
+		i, err := v.toDomain()
+		if err != nil {
+			return nil, err
+		}
+		reviewsList = append(reviewsList, i)
 	}
 	return reviewsList, nil
 }
@@ -130,7 +134,11 @@ func (r *reviewInfra) SelectAll() ([]domain.Review, error) {
 
 	var reviewsList []domain.Review
 	for _, v := range reviews {
-		reviewsList = append(reviewsList, v.toDomain())
+		i, err := v.toDomain()
+		if err != nil {
+			return nil, err
+		}
+		reviewsList = append(reviewsList, i)
 	}
 	return reviewsList, nil
 }
@@ -156,7 +164,11 @@ func (r *reviewInfra) GetNewReview() ([]domain.Review, error) {
 
 	var reviewsList []domain.Review
 	for _, v := range reviews {
-		reviewsList = append(reviewsList, v.toDomain())
+		i, err := v.toDomain()
+		if err != nil {
+			return nil, err
+		}
+		reviewsList = append(reviewsList, i)
 	}
 	return reviewsList, nil
 }

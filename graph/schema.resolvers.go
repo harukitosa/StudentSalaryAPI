@@ -48,9 +48,9 @@ func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWo
 }
 
 func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewReview) (*model.Review, error) {
-	review := domain.NewReview(
+	review, err := domain.NewReview(
+		nil,
 		&input.CompanyName,
-		input.Detail,
 		&input.Content,
 		input.CreateDataJs,
 		input.Link,
@@ -59,23 +59,40 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 		input.Skill,
 		input.UserName,
 	)
+	if err != nil {
+		return nil, err
+	}
 	id, err := r.Resolver.Review.Insert(review)
 	if err != nil {
 		return nil, err
 	}
+
+	return convertReviewGraphqlModel(id, review), nil
+}
+
+func convertReviewGraphqlModel(id int, r domain.Review) *model.Review {
+	review := r
+	companyName := review.GetCompanyName().String()
+	content := review.GetContent().String()
+	createdate := review.GetCreateDate().String()
+	link := review.GetLink().String()
+	reasons := review.GetReasons().String()
+	report := review.GetReport().String()
+	skill := review.GetSkill().String()
+	username := review.GetUserName().String()
+
 	response := model.Review{
 		ID:           fmt.Sprint(id),
-		CompanyName:  &review.CompanyName,
-		Detail:       &review.Detail,
-		Content:      &review.Content,
-		CreateDataJs: &review.CreateDateJS,
-		Link:         &review.Link,
-		Reasons:      &review.Reasons,
-		Report:       &review.Report,
-		Skill:        &review.Skill,
-		UserName:     &review.UserName,
+		CompanyName:  &companyName,
+		Content:      &content,
+		CreateDataJs: &createdate,
+		Link:         &link,
+		Reasons:      &reasons,
+		Report:       &report,
+		Skill:        &skill,
+		UserName:     &username,
 	}
-	return &response, nil
+	return &response
 }
 
 func convertGraphqlModel(w domain.WorkData) *model.WorkData {
@@ -112,8 +129,8 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 	for _, w := range workdata {
 		dto = append(dto, convertGraphqlModel(w))
 	}
-
 	workdataService := domain.WorkDataService{}
+
 	return &model.WorkDataInfo{
 		Avarage:      workdataService.GetSalaryAvg(workdata),
 		Mid:          workdataService.GetSalaryMid(workdata),
@@ -130,18 +147,7 @@ func (r *queryResolver) Review(ctx context.Context) ([]*model.Review, error) {
 	}
 	var dto []*model.Review
 	for _, v := range reviews {
-		dto = append(dto, &model.Review{
-			ID:           fmt.Sprint(v.ID),
-			CompanyName:  &v.CompanyName,
-			Detail:       &v.Detail,
-			Content:      &v.Content,
-			CreateDataJs: &v.CreateDateJS,
-			Link:         &v.Link,
-			Reasons:      &v.Reasons,
-			Report:       &v.Report,
-			Skill:        &v.Skill,
-			UserName:     &v.UserName,
-		})
+		dto = append(dto, convertReviewGraphqlModel(int(v.GetID()), v))
 	}
 	return dto, nil
 }
@@ -156,19 +162,7 @@ func (r *queryResolver) Newreview(ctx context.Context) ([]*model.Review, error) 
 	for _, s := range tmp {
 		var v domain.Review
 		v = s
-		r := model.Review{
-			ID:           fmt.Sprint(v.ID),
-			CompanyName:  &v.CompanyName,
-			Detail:       &v.Detail,
-			Content:      &v.Content,
-			CreateDataJs: &v.CreateDateJS,
-			Link:         &v.Link,
-			Reasons:      &v.Reasons,
-			Report:       &v.Report,
-			Skill:        &v.Skill,
-			UserName:     &v.UserName,
-		}
-		dto = append(dto, &r)
+		dto = append(dto, convertReviewGraphqlModel(int(v.GetID()), v))
 	}
 	return dto, nil
 }
@@ -210,18 +204,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		var reviews []*model.Review
 		for _, re := range review {
 			v := re
-			reviews = append(reviews, &model.Review{
-				ID:           fmt.Sprint(v.ID),
-				CompanyName:  &v.CompanyName,
-				Detail:       &v.Detail,
-				Content:      &v.Content,
-				CreateDataJs: &v.CreateDateJS,
-				Link:         &v.Link,
-				Reasons:      &v.Reasons,
-				Report:       &v.Report,
-				Skill:        &v.Skill,
-				UserName:     &v.UserName,
-			})
+			reviews = append(reviews, convertReviewGraphqlModel(int(v.GetID()), v))
 		}
 		var list []*model.Company
 		for _, v := range company {
@@ -265,18 +248,7 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		var reviews []*model.Review
 		for _, re := range review {
 			v := re
-			reviews = append(reviews, &model.Review{
-				ID:           fmt.Sprint(v.ID),
-				CompanyName:  &v.CompanyName,
-				Detail:       &v.Detail,
-				Content:      &v.Content,
-				CreateDataJs: &v.CreateDateJS,
-				Link:         &v.Link,
-				Reasons:      &v.Reasons,
-				Report:       &v.Report,
-				Skill:        &v.Skill,
-				UserName:     &v.UserName,
-			})
+			reviews = append(reviews, convertReviewGraphqlModel(int(v.GetID()), v))
 		}
 		var list []*model.Company
 		list = append(list, &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto, Review: reviews})
