@@ -551,12 +551,11 @@ input NewWorkData {
 
 input NewReview {
   company_name: String!
-  detail: String
-  content: String!
+  content: String
   create_data_js: String
   link: String
   reasons: String
-  report: String
+  report: String!
   skill: String
   user_name: String 
 }
@@ -3156,19 +3155,11 @@ func (ec *executionContext) unmarshalInputNewReview(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "detail":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("detail"))
-			it.Detail, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "content":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
-			it.Content, err = ec.unmarshalNString2string(ctx, v)
+			it.Content, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3200,7 +3191,7 @@ func (ec *executionContext) unmarshalInputNewReview(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("report"))
-			it.Report, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Report, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

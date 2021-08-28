@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/graph/model"
@@ -54,14 +55,15 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 	review, err := domain.NewReview(
 		&dummyID,
 		&input.CompanyName,
-		&input.Content,
+		input.Content,
 		input.CreateDataJs,
 		input.Link,
 		input.Reasons,
-		input.Report,
+		&input.Report,
 		input.Skill,
 		input.UserName,
 	)
+	log.Println("helloworld")
 	if err != nil {
 		return nil, err
 	}
@@ -70,56 +72,6 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 		return nil, err
 	}
 	return convertReviewGraphqlModel(id, review), nil
-}
-
-func convertReviewGraphqlModel(id int, r domain.Review) *model.Review {
-	review := r
-	companyName := review.GetCompanyName().String()
-	content := review.GetContent().String()
-	createdate := review.GetCreateDate().String()
-	link := review.GetLink().String()
-	reasons := review.GetReasons().String()
-	report := review.GetReport().String()
-	skill := review.GetSkill().String()
-	username := review.GetUserName().String()
-
-	response := model.Review{
-		ID:           fmt.Sprint(id),
-		CompanyName:  &companyName,
-		Content:      &content,
-		CreateDataJs: &createdate,
-		Link:         &link,
-		Reasons:      &reasons,
-		Report:       &report,
-		Skill:        &skill,
-		UserName:     &username,
-	}
-	return &response
-}
-
-func convertGraphqlModel(w domain.WorkData) *model.WorkData {
-	v := w
-	contractType := v.GetContractType().String()
-	engineringDomain := v.GetEnginneringDomain().String()
-	workdays := v.GetWorkDays().String()
-	workdetail := v.GetWorkDetail().String()
-	createdate := v.GetCreateDate().String()
-	experice := v.GetExperience().String()
-	isShow := v.GetApprove().Bool()
-	term := v.GetTerm().String()
-	return &model.WorkData{
-		ID:           fmt.Sprint(v.GetID().Int()),
-		Name:         v.GetCompanyName().String(),
-		Salary:       v.GetSalary().Int(),
-		CreateDataJs: &createdate,
-		Detail:       &workdetail,
-		Experience:   &experice,
-		IsShow:       &isShow,
-		Term:         &term,
-		Type:         &engineringDomain,
-		Workdays:     &workdays,
-		WorkType:     &contractType,
-	}
 }
 
 func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, error) {
@@ -266,3 +218,58 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func convertReviewGraphqlModel(id int, r domain.Review) *model.Review {
+	review := r
+	companyName := review.GetCompanyName().String()
+	content := review.GetContent().String()
+	createdate := review.GetCreateDate().String()
+	link := review.GetLink().String()
+	reasons := review.GetReasons().String()
+	report := review.GetReport().String()
+	skill := review.GetSkill().String()
+	username := review.GetUserName().String()
+
+	response := model.Review{
+		ID:           fmt.Sprint(id),
+		CompanyName:  &companyName,
+		Content:      &content,
+		CreateDataJs: &createdate,
+		Link:         &link,
+		Reasons:      &reasons,
+		Report:       &report,
+		Skill:        &skill,
+		UserName:     &username,
+	}
+	return &response
+}
+func convertGraphqlModel(w domain.WorkData) *model.WorkData {
+	v := w
+	contractType := v.GetContractType().String()
+	engineringDomain := v.GetEnginneringDomain().String()
+	workdays := v.GetWorkDays().String()
+	workdetail := v.GetWorkDetail().String()
+	createdate := v.GetCreateDate().String()
+	experice := v.GetExperience().String()
+	isShow := v.GetApprove().Bool()
+	term := v.GetTerm().String()
+	return &model.WorkData{
+		ID:           fmt.Sprint(v.GetID().Int()),
+		Name:         v.GetCompanyName().String(),
+		Salary:       v.GetSalary().Int(),
+		CreateDataJs: &createdate,
+		Detail:       &workdetail,
+		Experience:   &experice,
+		IsShow:       &isShow,
+		Term:         &term,
+		Type:         &engineringDomain,
+		Workdays:     &workdays,
+		WorkType:     &contractType,
+	}
+}

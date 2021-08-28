@@ -69,12 +69,11 @@ input NewWorkData {
 
 input NewReview {
   company_name: String!
-  detail: String
-  content: String!
+  content: String
   create_data_js: String
   link: String
   reasons: String
-  report: String
+  report: String!
   skill: String
   user_name: String 
 }
