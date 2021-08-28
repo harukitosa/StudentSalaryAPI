@@ -104,7 +104,7 @@ func main() {
 	srv.AddTransport(&transport.Websocket{
 		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
-				return r.Host == "http://localhost:3000"
+				return r.Host == "http://localhost:3000" || r.Host == "https://student-salary.com" || r.Host == "https://studentsalary.vercel.app"
 			},
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,

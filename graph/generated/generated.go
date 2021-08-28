@@ -60,7 +60,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Company      func(childComplexity int, name *string) int
 		Newreview    func(childComplexity int) int
-		Review       func(childComplexity int) int
+		Review       func(childComplexity int, id *int) int
 		Topcompany   func(childComplexity int) int
 		Workdatainfo func(childComplexity int) int
 	}
@@ -107,7 +107,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Workdatainfo(ctx context.Context) (*model.WorkDataInfo, error)
-	Review(ctx context.Context) ([]*model.Review, error)
+	Review(ctx context.Context, id *int) ([]*model.Review, error)
 	Newreview(ctx context.Context) ([]*model.Review, error)
 	Topcompany(ctx context.Context) ([]*model.Company, error)
 	Company(ctx context.Context, name *string) ([]*model.Company, error)
@@ -218,7 +218,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Review(childComplexity), true
+		args, err := ec.field_Query_review_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Review(childComplexity, args["id"].(*int)), true
 
 	case "Query.topcompany":
 		if e.complexity.Query.Topcompany == nil {
@@ -485,7 +490,7 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 type Query {
   workdatainfo: WorkDataInfo!
-  review: [Review!]
+  review(id: Int): [Review!]
   newreview: [Review!]
   topcompany: [Company!]
   company(name: String): [Company!]
@@ -628,6 +633,21 @@ func (ec *executionContext) field_Query_company_args(ctx context.Context, rawArg
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_review_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1008,9 +1028,16 @@ func (ec *executionContext) _Query_review(ctx context.Context, field graphql.Col
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_review_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Review(rctx)
+		return ec.resolvers.Query().Review(rctx, args["id"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4287,6 +4314,21 @@ func (ec *executionContext) marshalOCompany2ᚕᚖstudentSalaryAPIᚋgraphᚋmod
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt(*v)
 }
 
 func (ec *executionContext) marshalOReview2ᚕᚖstudentSalaryAPIᚋgraphᚋmodelᚐReviewᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Review) graphql.Marshaler {

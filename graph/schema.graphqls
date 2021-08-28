@@ -3,7 +3,7 @@
 # https://gqlgen.com/getting-started/
 type Query {
   workdatainfo: WorkDataInfo!
-  review: [Review!]
+  review(id: Int): [Review!]
   newreview: [Review!]
   topcompany: [Company!]
   company(name: String): [Company!]

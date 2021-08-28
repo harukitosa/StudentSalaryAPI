@@ -94,11 +94,22 @@ func (r *queryResolver) Workdatainfo(ctx context.Context) (*model.WorkDataInfo, 
 	}, nil
 }
 
-func (r *queryResolver) Review(ctx context.Context) ([]*model.Review, error) {
-	reviews, err := r.Resolver.Review.SelectAll()
-	if err != nil {
-		return nil, err
+func (r *queryResolver) Review(ctx context.Context, id *int) ([]*model.Review, error) {
+	var reviews []domain.Review
+	var err error
+	if id == nil {
+		reviews, err = r.Resolver.Review.SelectAll()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		review, err := r.Resolver.Review.SelectByID(*id)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, review)
 	}
+
 	var dto []*model.Review
 	for _, v := range reviews {
 		dto = append(dto, convertReviewGraphqlModel(int(v.GetID()), v))
