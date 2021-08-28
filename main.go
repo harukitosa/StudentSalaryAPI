@@ -110,13 +110,14 @@ func main() {
 			WriteBufferSize: 1024,
 		},
 	})
+	log.Println("server start :8080")
+
 	router.Handle("/", playground.Handler("Starwars", "/query"))
 	router.Handle("/query", srv)
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		panic(err)
 	}
-	log.Println("server start :8080")
 
 	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	// http.Handle("/query", srv)

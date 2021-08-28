@@ -20,13 +20,6 @@ type WorkData struct {
 	contractType      contractType
 }
 
-type WorkDataRepository interface {
-	Insert(salary WorkData) (id int, err error)
-	SelectByID(id int) (WorkData, error)
-	SelectByName(name string) ([]WorkData, error)
-	SelectAll() ([]WorkData, error)
-}
-
 func (w *WorkData) GetID() *workdataID {
 	return &w.id
 }
@@ -141,13 +134,13 @@ func isworkterm(value string) bool {
 	return value == oneday || value == twodays || value == week || value == twoweeks || value == threeweeks || value == month || value == twoorthreemonth || value == halfyear || value == year || value == twoorthreeyear || value == morethanthreeyear
 }
 
-func newworkterm(value *string) (*workterm, error) {
+func newworkterm(value *string) (workterm, error) {
 	if isworkterm(*value) {
 		term := workterm(*value)
-		return &term, nil
+		return term, nil
 	}
 	str := workterm("未記入")
-	return &str, nil
+	return str, nil
 }
 
 func (w *workterm) String() string {
@@ -307,7 +300,6 @@ func (s *WorkDataService) GetSalaryMid(list []WorkData) int {
 	if len(list) == 0 {
 		return 0
 	}
-	// sort.Slice(list, func(i, j int) bool { return list[i].salary < list[j].salary })
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].salary.isBiggerThan(&list[j].salary)
 	})
@@ -347,7 +339,6 @@ func NewWorkData(
 	Type *string,
 	workDays *string,
 	workType *string) (*WorkData, error) {
-
 	salary, err := newsalary(s)
 	if err != nil {
 		return nil, err
@@ -368,8 +359,8 @@ func NewWorkData(
 	if err != nil {
 		return nil, err
 	}
-	wd := newworkdetail(detail)
 
+	wd := newworkdetail(detail)
 	workdataID, err := newworkdataID(id)
 	if err != nil {
 		return nil, err
@@ -380,40 +371,21 @@ func NewWorkData(
 	if err != nil {
 		return nil, err
 	}
+	date := newcreateDate(create_data_js)
 
 	w := WorkData{
 		id:                workdataID,
 		name:              companyName,
 		salary:            *salary,
-		createDate:        createDate(*create_data_js),
+		createDate:        date,
 		detail:            wd,
 		experience:        e,
 		isShow:            newapproval(isShow),
-		term:              *wterm,
+		term:              wterm,
 		engineeringDomain: engineeringDomain,
 		workdays:          workdays,
 		contractType:      contractType,
 	}
+
 	return &w, nil
-}
-
-func convertNilString(str *string) string {
-	if str == nil {
-		return ""
-	}
-	return *str
-}
-
-func convertNilBoolean(b *bool) bool {
-	if b == nil {
-		return false
-	}
-	return true
-}
-
-func convertNilInt(i *int) int {
-	if i == nil {
-		return 0
-	}
-	return *i
 }

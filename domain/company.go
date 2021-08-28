@@ -12,12 +12,6 @@ type Company struct {
 	WorkData []WorkData
 }
 
-type CompanyRepository interface {
-	SelectByTop() ([]Company, error)
-	SelectByName(name string) (*Company, error)
-	Select() ([]Company, error)
-}
-
 // VO: 企業名
 type companyName string
 

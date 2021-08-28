@@ -2,6 +2,7 @@ package infra
 
 import (
 	"studentSalaryAPI/domain"
+	"studentSalaryAPI/repository"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -17,7 +18,7 @@ type company struct {
 	Count int    `db:"count"`
 }
 
-func NewCompanyInfra(db *sqlx.DB) domain.CompanyRepository {
+func NewCompanyInfra(db *sqlx.DB) repository.CompanyRepository {
 	return &companyInfra{db: db}
 }
 func (r *companyInfra) SelectByTop() ([]domain.Company, error) {

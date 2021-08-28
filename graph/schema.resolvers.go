@@ -12,8 +12,9 @@ import (
 )
 
 func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWorkData) (*model.WorkData, error) {
+	dummyID := 1
 	workdata, err := domain.NewWorkData(
-		nil,
+		&dummyID,
 		input.CreateDataJs,
 		input.Detail,
 		input.Experience,
@@ -48,8 +49,10 @@ func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWo
 }
 
 func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewReview) (*model.Review, error) {
+	// dummy用: 書き直す
+	dummyID := 0
 	review, err := domain.NewReview(
-		nil,
+		&dummyID,
 		&input.CompanyName,
 		&input.Content,
 		input.CreateDataJs,
@@ -66,7 +69,6 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 	if err != nil {
 		return nil, err
 	}
-
 	return convertReviewGraphqlModel(id, review), nil
 }
 

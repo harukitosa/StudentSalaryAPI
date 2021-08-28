@@ -18,14 +18,6 @@ type Review struct {
 	userName     userName
 }
 
-type ReviewRepository interface {
-	Insert(review Review) (id int, err error)
-	SelectByID(id int) (Review, error)
-	SelectByName(name string) ([]Review, error)
-	SelectAll() ([]Review, error)
-	GetNewReview() ([]Review, error)
-}
-
 func (r *Review) GetID() reviewID {
 	return r.id
 }
@@ -97,14 +89,14 @@ func newlink(value *string) link {
 	if value == nil || *value == "" {
 		return link("")
 	}
-	if IsUrl(*value) {
+	if isUrl(*value) {
 		return link(*value)
 	}
 	// invalid
 	return link("")
 }
 
-func IsUrl(str string) bool {
+func isUrl(str string) bool {
 	u, err := url.Parse(str)
 	return err == nil && u.Scheme != "" && u.Host != ""
 }

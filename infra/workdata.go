@@ -3,6 +3,7 @@ package infra
 import (
 	"log"
 	"studentSalaryAPI/domain"
+	"studentSalaryAPI/repository"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -12,7 +13,7 @@ type workdataInfra struct {
 	db *sqlx.DB
 }
 
-func NewWorkDataInfra(db *sqlx.DB) domain.WorkDataRepository {
+func NewWorkDataInfra(db *sqlx.DB) repository.WorkDataRepository {
 	return &workdataInfra{db: db}
 }
 

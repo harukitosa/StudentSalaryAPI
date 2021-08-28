@@ -3,6 +3,7 @@ package infra
 import (
 	"log"
 	"studentSalaryAPI/domain"
+	"studentSalaryAPI/repository"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -12,7 +13,7 @@ type reviewInfra struct {
 	db *sqlx.DB
 }
 
-func NewReviewInfra(db *sqlx.DB) domain.ReviewRepository {
+func NewReviewInfra(db *sqlx.DB) repository.ReviewRepository {
 	return &reviewInfra{db: db}
 }
 
