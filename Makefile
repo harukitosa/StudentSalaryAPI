@@ -7,6 +7,10 @@ build:
 deploy:
 	gcloud app deploy
 
+gql:
+	go run github.com/99designs/gqlgen generate
+
+
 dev:
 	go build && ./studentSalaryAPI
 
