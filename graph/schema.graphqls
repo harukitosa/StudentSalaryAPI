@@ -7,6 +7,20 @@ type Query {
   newreview: [Review!]
   topcompany: [Company!]
   company(name: String): [Company!]
+  blog(company_name: String, limit: Int): BlogData!
+}
+
+type BlogData {
+  blog: [Blog!]!
+  nameList: [String!]!
+}
+
+type Blog {
+  title: String!
+  company_name: String!
+  url: String!
+  year: String!
+  season: String!
 }
 
 type Company {

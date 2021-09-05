@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"studentSalaryAPI/graph/model"
 	"studentSalaryAPI/repository"
 )
 
@@ -12,4 +13,6 @@ type Resolver struct {
 	Review   repository.ReviewRepository
 	Workdata repository.WorkDataRepository
 	Company  repository.CompanyRepository
+	// とりあえずここに
+	Blog []*model.Blog
 }

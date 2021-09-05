@@ -2,6 +2,19 @@
 
 package model
 
+type Blog struct {
+	Title       string `json:"title"`
+	CompanyName string `json:"company_name"`
+	URL         string `json:"url"`
+	Year        string `json:"year"`
+	Season      string `json:"season"`
+}
+
+type BlogData struct {
+	Blog     []*Blog  `json:"blog"`
+	NameList []string `json:"nameList"`
+}
+
 type Company struct {
 	Name     string      `json:"name"`
 	Max      int         `json:"max"`

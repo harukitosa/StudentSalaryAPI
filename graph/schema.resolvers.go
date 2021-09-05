@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/graph/model"
@@ -29,10 +28,12 @@ func (r *mutationResolver) CreateWorkData(ctx context.Context, input model.NewWo
 	if err != nil {
 		return nil, err
 	}
+
 	id, err := r.Resolver.Workdata.Insert(*workdata)
 	if err != nil {
 		return nil, err
 	}
+
 	response := &model.WorkData{
 		ID:           fmt.Sprint(id),
 		Name:         *input.Name,
@@ -63,14 +64,15 @@ func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewRevi
 		input.Skill,
 		input.UserName,
 	)
-	log.Println("helloworld")
 	if err != nil {
 		return nil, err
 	}
+
 	id, err := r.Resolver.Review.Insert(review)
 	if err != nil {
 		return nil, err
 	}
+
 	return convertReviewGraphqlModel(id, review), nil
 }
 
@@ -219,6 +221,43 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 		list = append(list, &model.Company{Max: company.Max, Min: company.Min, Count: company.Count, Name: company.Name, Workdata: dto, Review: reviews})
 		return list, nil
 	}
+}
+
+func (r *queryResolver) Blog(ctx context.Context, companyName *string, limit *int) (*model.BlogData, error) {
+	var responseBlog *model.BlogData
+	responseBlog = new(model.BlogData)
+	// name listの作成
+	m := make(map[string]bool)
+	uniq := []string{}
+
+	for _, ele := range r.Resolver.Blog {
+		if !m[ele.CompanyName] {
+			m[ele.CompanyName] = true
+			uniq = append(uniq, ele.CompanyName)
+		}
+	}
+
+	// companyNameでの絞り込み
+	if companyName != nil && *companyName != "all" {
+		for _, v := range r.Resolver.Blog {
+			if v.CompanyName == *companyName {
+				responseBlog.Blog = append(responseBlog.Blog, v)
+			}
+		}
+		responseBlog.NameList = uniq
+	} else {
+		responseBlog = &model.BlogData{NameList: uniq, Blog: r.Resolver.Blog}
+	}
+
+	if limit != nil {
+		if *limit > len(responseBlog.Blog) {
+			responseBlog.NameList = uniq
+			return responseBlog, nil
+		}
+		responseBlog.Blog = responseBlog.Blog[0:*limit]
+		return responseBlog, nil
+	}
+	return responseBlog, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

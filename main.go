@@ -2,12 +2,17 @@ package main
 
 // // [START import]
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strconv"
 	"studentSalaryAPI/graph"
 	"studentSalaryAPI/graph/generated"
+	"studentSalaryAPI/graph/model"
 	"studentSalaryAPI/infra"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -67,6 +72,7 @@ func main() {
 		port = defaultPort
 	}
 	v := os.Getenv("RUNENV")
+
 	var db *sqlx.DB
 	var err error
 	if v == "production" {
@@ -85,6 +91,20 @@ func main() {
 
 	router := chi.NewRouter()
 
+	// json読み込み
+	raw, err := ioutil.ReadFile("./blog.json")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	var blogs []*model.Blog
+	json.Unmarshal(raw, &blogs)
+	sort.Slice(blogs, func(i, j int) bool {
+		blog1, _ := strconv.Atoi(blogs[i].Year)
+		blog2, _ := strconv.Atoi(blogs[j].Year)
+		return blog1 > blog2
+	})
+
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
@@ -99,6 +119,7 @@ func main() {
 				Review:   review,
 				Workdata: workdata,
 				Company:  company,
+				Blog:     blogs,
 			}}))
 
 	srv.AddTransport(&transport.Websocket{
@@ -112,60 +133,12 @@ func main() {
 	})
 	log.Println("server start :8080")
 
-	router.Handle("/", playground.Handler("Starwars", "/query"))
+	router.Handle("/", playground.Handler("student-salary", "/query"))
 	router.Handle("/query", srv)
+
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		panic(err)
 	}
 
-	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	// http.Handle("/query", srv)
-	// log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	// log.Fatal(http.ListenAndServe(":"+port, nil))
 }
-
-// e := echo.New()
-
-// e.Use(middleware.Logger())
-// e.Use(middleware.Recover())
-// localhostの方は消す
-
-// var db *sqlx.DB
-
-// if err != nil {
-// 	log.Fatal(err)
-// }
-
-// reviewHandler := handler.NewReviewHandler(review)
-// workdataHandler := handler.NewWorkDataHandler(workdata)
-
-// e.GET("/", func(c echo.Context) error {
-// 	return c.JSON(http.StatusOK, map[string]string{"ping": "pong"})
-// })
-
-// // // JobSalary
-// e.GET("/jobSalary", workdataHandler.GetReview)
-// e.GET("/jobSalary/statistics", workdataHandler.GetAggregateWorkData)
-// e.POST("/jobSalary", workdataHandler.CreateWorkData)
-// // e.POST("/jobSalaries", jobSalaryAPI.ExportJobsSalary)
-
-// // Review
-// e.GET("/review", reviewHandler.GetReview)
-// e.GET("/review/:id", reviewHandler.GetReviewByID)
-// e.POST("/review", reviewHandler.CreateReview)
-// e.GET("/review/created", reviewHandler.GetReviewByCreated)
-// e.POST("/reviews", reviewAPI.ExportReview)
-
-// // JobSalaryMap
-// e.GET("/jobSalaryMap", jobSalaryMapAPI.GetJobSalaryMap)
-// e.GET("/jobSalaryMap/count", jobSalaryMapAPI.GetJobSalaryMapByCount)
-// e.GET("/jobSalaryMapData", jobSalaryAPI.GetJobsSalaryMap)
-
-// port := os.Getenv("PORT")
-// if port == "" {
-// 	port = "8080"
-// 	log.Printf("Defaulting to port %s", port)
-// }
-// log.Printf("Listening on port %s", port)
-// e.Logger.Fatal(e.Start(":" + port))
