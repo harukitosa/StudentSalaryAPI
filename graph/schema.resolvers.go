@@ -228,7 +228,13 @@ func (r *queryResolver) Blog(ctx context.Context, companyName *string, limit *in
 	var responseBlog *model.BlogData
 	responseBlog = new(model.BlogData)
 
-	if companyName != nil && *companyName == "all" {
+	list, err := r.Resolver.Blog.GetCompanyNameList()
+	if err != nil {
+		return nil, err
+	}
+	responseBlog.NameList = list
+
+	if *companyName == "all" || companyName == nil {
 		blogs, err := r.Resolver.Blog.Select()
 		if err != nil {
 			return nil, err
@@ -242,14 +248,23 @@ func (r *queryResolver) Blog(ctx context.Context, companyName *string, limit *in
 				Season:      v.Season,
 			})
 		}
-		list, err := r.Resolver.Blog.GetCompanyNameList()
+		return responseBlog, nil
+	} else {
+		blogs, err := r.Resolver.Blog.SelectByName(*companyName)
 		if err != nil {
 			return nil, err
 		}
-		responseBlog.NameList = list
+		for _, v := range blogs {
+			responseBlog.Blog = append(responseBlog.Blog, &model.Blog{
+				Title:       v.Title,
+				CompanyName: v.Company_name,
+				URL:         v.URL,
+				Year:        strconv.Itoa(v.Year),
+				Season:      v.Season,
+			})
+		}
 		return responseBlog, nil
 	}
-	return nil, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

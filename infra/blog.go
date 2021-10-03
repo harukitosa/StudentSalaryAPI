@@ -1,7 +1,7 @@
 package infra
 
 import (
-	"fmt"
+	"log"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/repository"
 
@@ -16,8 +16,33 @@ func NewBlogInfra(db *sqlx.DB) repository.BlogRepository {
 	return &blogInfra{db: db}
 }
 
-func (b *blogInfra) SelectByName(name string) (*domain.Blog, error) {
-	return nil, fmt.Errorf("not impl")
+func (b *blogInfra) SelectByName(name string) ([]domain.Blog, error) {
+	query := `SELECT * FROM blogs WHERE company_name=:name ORDER BY year DESC`
+	stmt, err := b.db.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+	args := map[string]interface{}{
+		"name": name,
+	}
+
+	var items []blog
+	err = stmt.Select(&items, args)
+	if err != nil {
+		return nil, err
+	}
+	var blogs []domain.Blog
+	for _, v := range items {
+		blogs = append(blogs, domain.Blog{
+			ID:           v.ID,
+			URL:          v.URL,
+			Title:        v.Title,
+			Company_name: v.Company_name,
+			Year:         v.Year,
+			Season:       v.Season})
+	}
+	log.Println(blogs)
+	return blogs, nil
 }
 
 func (b *blogInfra) Select() ([]domain.Blog, error) {
