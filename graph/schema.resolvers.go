@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"studentSalaryAPI/domain"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/graph/model"
@@ -226,38 +227,29 @@ func (r *queryResolver) Company(ctx context.Context, name *string) ([]*model.Com
 func (r *queryResolver) Blog(ctx context.Context, companyName *string, limit *int) (*model.BlogData, error) {
 	var responseBlog *model.BlogData
 	responseBlog = new(model.BlogData)
-	// name listの作成
-	m := make(map[string]bool)
-	uniq := []string{}
 
-	for _, ele := range r.Resolver.Blog {
-		if !m[ele.CompanyName] {
-			m[ele.CompanyName] = true
-			uniq = append(uniq, ele.CompanyName)
+	if companyName != nil && *companyName == "all" {
+		blogs, err := r.Resolver.Blog.Select()
+		if err != nil {
+			return nil, err
 		}
-	}
-
-	// companyNameでの絞り込み
-	if companyName != nil && *companyName != "all" {
-		for _, v := range r.Resolver.Blog {
-			if v.CompanyName == *companyName {
-				responseBlog.Blog = append(responseBlog.Blog, v)
-			}
+		for _, v := range blogs {
+			responseBlog.Blog = append(responseBlog.Blog, &model.Blog{
+				Title:       v.Title,
+				CompanyName: v.Company_name,
+				URL:         v.URL,
+				Year:        strconv.Itoa(v.Year),
+				Season:      v.Season,
+			})
 		}
-		responseBlog.NameList = uniq
-	} else {
-		responseBlog = &model.BlogData{NameList: uniq, Blog: r.Resolver.Blog}
-	}
-
-	if limit != nil {
-		if *limit > len(responseBlog.Blog) {
-			responseBlog.NameList = uniq
-			return responseBlog, nil
+		list, err := r.Resolver.Blog.GetCompanyNameList()
+		if err != nil {
+			return nil, err
 		}
-		responseBlog.Blog = responseBlog.Blog[0:*limit]
+		responseBlog.NameList = list
 		return responseBlog, nil
 	}
-	return responseBlog, nil
+	return nil, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

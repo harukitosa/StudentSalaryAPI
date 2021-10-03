@@ -2,17 +2,12 @@ package main
 
 // // [START import]
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"sort"
-	"strconv"
 	"studentSalaryAPI/graph"
 	"studentSalaryAPI/graph/generated"
-	"studentSalaryAPI/graph/model"
 	"studentSalaryAPI/infra"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -56,7 +51,7 @@ func initDB() (*sqlx.DB, error) {
 }
 
 func initLocalDB() (*sqlx.DB, error) {
-	dns := "root:@tcp(127.0.0.1:3306)/sample?charset=utf8mb4&parseTime=True&loc=Local"
+	dns := "root:root@tcp(127.0.0.1:3306)/sample?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := sqlx.Open("mysql", dns)
 	if err != nil {
 		return nil, err
@@ -88,22 +83,9 @@ func main() {
 	review := infra.NewReviewInfra(db)
 	workdata := infra.NewWorkDataInfra(db)
 	company := infra.NewCompanyInfra(db)
+	blog := infra.NewBlogInfra(db)
 
 	router := chi.NewRouter()
-
-	// json読み込み
-	raw, err := ioutil.ReadFile("./blog.json")
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	var blogs []*model.Blog
-	json.Unmarshal(raw, &blogs)
-	sort.Slice(blogs, func(i, j int) bool {
-		blog1, _ := strconv.Atoi(blogs[i].Year)
-		blog2, _ := strconv.Atoi(blogs[j].Year)
-		return blog1 > blog2
-	})
 
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
@@ -119,7 +101,7 @@ func main() {
 				Review:   review,
 				Workdata: workdata,
 				Company:  company,
-				Blog:     blogs,
+				Blog:     blog,
 			}}))
 
 	srv.AddTransport(&transport.Websocket{
