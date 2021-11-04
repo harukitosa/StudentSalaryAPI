@@ -234,7 +234,7 @@ func (r *queryResolver) Blog(ctx context.Context, companyName *string, limit *in
 	}
 	responseBlog.NameList = list
 
-	if companyName == nil || *companyName == "all" {
+	if *companyName == "all" || companyName == nil {
 		blogs, err := r.Resolver.Blog.Select()
 		if err != nil {
 			return nil, err

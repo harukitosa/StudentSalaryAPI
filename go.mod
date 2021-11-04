@@ -3,7 +3,6 @@ module studentSalaryAPI
 go 1.14
 
 require (
-	cloud.google.com/go/datastore v1.6.0 // indirect
 	github.com/99designs/gqlgen v0.13.0
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.5.0

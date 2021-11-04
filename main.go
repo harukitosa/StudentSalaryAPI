@@ -2,7 +2,6 @@ package main
 
 // // [START import]
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,9 +9,7 @@ import (
 	"studentSalaryAPI/graph"
 	"studentSalaryAPI/graph/generated"
 	"studentSalaryAPI/infra"
-	"time"
 
-	"cloud.google.com/go/datastore"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -23,8 +20,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/cors"
 )
-
-var datastoreClient *datastore.Client
 
 func mustGetenv(k string) string {
 	v := os.Getenv(k)
@@ -118,73 +113,14 @@ func main() {
 			WriteBufferSize: 1024,
 		},
 	})
-
-	ctx := context.Background()
-
-	datastoreClient, err = datastore.NewClient(ctx, os.Getenv("GCLOUD_DATASET_ID"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Println("server start :8080")
 
 	router.Handle("/", playground.Handler("student-salary", "/query"))
 	router.Handle("/query", srv)
-	router.HandleFunc("/handle", handle)
 
-	log.Println("server start :8080")
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		panic(err)
 	}
 
-}
-
-func handle(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
-
-	// Get a list of the most recent visits.
-	visits, err := queryVisits(ctx, 10)
-	if err != nil {
-		msg := fmt.Sprintf("Could not save visit: %v", err)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	// Record this visit.
-	if err := recordVisit(ctx, time.Now(), r.RemoteAddr); err != nil {
-		msg := fmt.Sprintf("Could not save visit: %v", err)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprintln(w, "Previous visits:")
-	for _, v := range visits {
-		fmt.Fprintf(w, "[%s] %s\n", v.Timestamp, v.UserIP)
-	}
-
-	fmt.Fprintln(w, "\nSuccessfully stored an entry of the current request.")
-}
-
-type visit struct {
-	Timestamp time.Time
-	UserIP    string
-}
-
-func recordVisit(ctx context.Context, now time.Time, userIP string) error {
-	v := &visit{
-		Timestamp: now,
-		UserIP:    userIP,
-	}
-
-	k := datastore.IncompleteKey("Visit", nil)
-
-	_, err := datastoreClient.Put(ctx, k, v)
-	return err
-}
-
-func queryVisits(ctx context.Context, limit int64) ([]*visit, error) {
-	q := datastore.NewQuery("Visit").Order("-Timestamp").Limit(10)
-
-	visits := make([]*visit, 0)
-	_, err := datastoreClient.GetAll(ctx, q, &visits)
-	return visits, err
 }
