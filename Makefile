@@ -5,7 +5,7 @@ build:
 	go build
 
 deploy:
-	gcloud app deploy
+	gcloud app deploy --project=studentsalaryprod
 
 gql:
 	go run github.com/99designs/gqlgen generate
