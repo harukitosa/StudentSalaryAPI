@@ -90,7 +90,7 @@ func main() {
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080", "https://studentsalary.vercel.app", "https://student-salary.com", "https://www.student-salary.com"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:8080", "https://studentsalary.vercel.app", "https://student-salary.com", "https://www.student-salary.com", "https://student-salary-cnhpcagh2a-an.a.run.app"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
@@ -107,7 +107,7 @@ func main() {
 	srv.AddTransport(&transport.Websocket{
 		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
-				return r.Host == "http://localhost:3000" || r.Host == "https://student-salary.com" || r.Host == "https://studentsalary.vercel.app"
+				return r.Host == "http://localhost:3000" || r.Host == "https://student-salary.com" || r.Host == "https://studentsalary.vercel.app" || r.Host == "https://student-salary-cnhpcagh2a-an.a.run.app"
 			},
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
